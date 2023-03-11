@@ -1,25 +1,26 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
     Collapse,
-    Nav,
     Navbar,
     NavbarBrand,
     NavbarToggler
 } from 'reactstrap';
+import RegisterLoginModal from './RegisterLoginModal';
+import { selectCurrentUser } from '../features/user/userSlice';
 
 const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const currentUser = useSelector(selectCurrentUser);
 
     return (
-        <Navbar dark sticky='top' expand='md'>
+        <Navbar dark color='success' sticky='top' expand='md'>
             <NavbarBrand className='ms-5' href='/'>
-                <h1 className='mt-1'>Mern Boilerplate</h1>
+                <h3 className='mt-1'>Mern Boilerplate</h3>
             </NavbarBrand>
             <NavbarToggler onClick={() => setMenuOpen(!menuOpen)} />
             <Collapse isOpen={menuOpen} navbar>
-                <Nav className='ms-auto' navbar>
-                    
-                </Nav>
+                <RegisterLoginModal />
             </Collapse>
         </Navbar>
     )
