@@ -13,7 +13,7 @@ userRouter.route('/')
         res.setHeader('Content-Type', 'application/json');
         res.json(allUsers);
     } catch (err) {
-        next(err);
+        return next(err);
     }
 })
 .delete([cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin], async (req, res, next) => {
@@ -23,7 +23,7 @@ userRouter.route('/')
         res.setHeader('Content-Type', 'application/json');
         res.json({ success: true, status: 'All users successfully deleted.'});
     } catch (err) {
-        next(err);
+        return next(err);
     }
 });
 
@@ -48,7 +48,7 @@ userRouter.route('/:userId')
             return next(err);
         }
     } catch (err) {
-        next(err);
+        return next(err);
     }
 })
 .put([cors.corsWithOptions, authenticate.verifyUser], async (req, res, next) => {
@@ -73,7 +73,7 @@ userRouter.route('/:userId')
             return next(err);
         }
     } catch (err) {
-        next(err);
+        return next(err);
     }
 })
 .delete([cors.corsWithOptions, authenticate.verifyUser], async (req, res, next) => {
@@ -96,17 +96,17 @@ userRouter.route('/:userId')
             return next(err);
         }
     } catch (err) {
-        next(err);
+        return next(err);
     }
 });
 
-userRouter.post('/signup', cors.corsWithOptions, (req, res, next) => {
+userRouter.post('/register', cors.corsWithOptions, (req, res, next) => {
     try {
         User.register(new User(
             // admin incl. below for testing purposes w/ Postman, remove for production
             { username: req.body.username, email: req.body.email, admin: req.body.admin }), 
             req.body.password,
-            (user) => {
+            () => {
                 passport.authenticate('local')(req, res, () => {
                     res.statusCode = 200;
                     res.setHeader('Content-Type', 'application/json');
@@ -115,7 +115,7 @@ userRouter.post('/signup', cors.corsWithOptions, (req, res, next) => {
             }
         );
     } catch (err) {
-        next(err);
+        return next(err);
     }
 });
 
@@ -126,7 +126,7 @@ userRouter.post('/login', [cors.corsWithOptions, passport.authenticate('local')]
         res.setHeader('Content-Type', 'application/json');
         res.json({ success: true, token: token, status: 'You have successfully logged in.' });
     } catch (err) {
-        next(err);
+        return next(err);
     }
 });
 
