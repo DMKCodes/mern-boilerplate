@@ -103,8 +103,7 @@ userRouter.route('/:userId')
 userRouter.post('/register', cors.corsWithOptions, (req, res, next) => {
     try {
         User.register(new User(
-            // admin incl. below for testing purposes w/ Postman, remove for production
-            { username: req.body.username, email: req.body.email, admin: req.body.admin }), 
+            { username: req.body.username, email: req.body.email }), 
             req.body.password,
             () => {
                 passport.authenticate('local')(req, res, () => {
