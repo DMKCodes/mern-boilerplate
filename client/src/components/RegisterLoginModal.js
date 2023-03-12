@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
-import { setCurrentUser, selectCurrentUser } from '../features/user/userSlice';
+import { setCurrentUser, selectCurrentUser, setAdmin } from '../features/user/userSlice';
 import {
     Button,
     Col,
@@ -26,6 +26,9 @@ const RegisterLoginModal = () => {
         axios.post('http://localhost:5000/users/register', values)
         .then(response => {
             if (response.data.success === true) {
+                if (values.admin) {
+                    dispatch(setAdmin(true));
+                }
                 handleLoginSubmit({ username: values.username, password: values.password });
             }
         })
@@ -43,7 +46,7 @@ const RegisterLoginModal = () => {
                 dispatch(setCurrentUser(user));
                 setTimeout(() => {
                     setModalOpen(false);
-                }, '3000')
+                }, '2000')
             }
         })
         .catch(err => console.log(err));
@@ -126,6 +129,18 @@ const RegisterLoginModal = () => {
                                                 name='email'
                                                 placeholder='email'
                                                 className='form-control'
+                                            />
+                                        </Col>
+                                    </FormGroup>
+                                    <FormGroup row>
+                                        <Label check htmlFor='admin' md='3'>
+                                            Admin?
+                                        </Label>
+                                        <Col md='9'>
+                                            <Field
+                                                name='admin'
+                                                type='checkbox'
+                                                className='form-check-input'
                                             />
                                         </Col>
                                     </FormGroup>
