@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 import {
     Collapse,
+    Nav,
+    NavItem,
     Navbar,
     NavbarBrand,
     NavbarToggler
@@ -19,11 +22,20 @@ const Header = () => {
                 <h3 className='mt-1'>Mern Boilerplate</h3>
             </NavbarBrand>
             <NavbarToggler onClick={() => setMenuOpen(!menuOpen)} />
-            <Collapse isOpen={menuOpen} navbar>
+            <Collapse isOpen={menuOpen} navbar className='me-5'>
+                <Nav className='ms-auto' navbar>
+                    {currentUser &&
+                        <NavItem>
+                            <NavLink className='nav-link me-3' to='/dashboard'>
+                                Dashboard
+                            </NavLink>
+                        </NavItem>
+                    }
+                </Nav>
                 <RegisterLoginModal />
             </Collapse>
         </Navbar>
-    )
+    );
 };
 
 export default Header;

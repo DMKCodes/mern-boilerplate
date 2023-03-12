@@ -31,3 +31,7 @@ export const { setCurrentUser } = userSlice.actions;
 export const selectCurrentUser = (state) => {
     return state.user.currentUser;
 };
+
+export const checkAdmin = (state) => {
+    return state.user.isAdmin;
+};
