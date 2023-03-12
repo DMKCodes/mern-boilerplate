@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
 import { setCurrentUser, selectCurrentUser, setAdmin } from '../features/user/userSlice';
+import axios from 'axios';
 import {
     Button,
     Col,
