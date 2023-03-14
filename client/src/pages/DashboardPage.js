@@ -14,11 +14,11 @@ const DashboardPage = ({ user }) => {
                 <h2>Welcome, {username}!</h2>
             </Row>
             <Row className='d-flex justify-content-center'>
-                <UserCard />
+                <UserCard user={user} />
             </Row>
             {isAdmin ? (
                 <Row className='d-flex justify-content-center'>
-                    <AdminCard />
+                    <AdminCard user={user} />
                 </Row>
             ) : (
                 null

@@ -7,6 +7,7 @@ const config = require('./config');
 
 const indexRouter = require('./routes/indexRouter');
 const userRouter = require('./routes/userRouter');
+const uploadRouter = require('./routes/uploadRouter');
 
 // configure mongodb w/ mongoose
 const mongoose = require('mongoose');
@@ -40,6 +41,7 @@ app.use(passport.initialize());
 
 app.use('/', indexRouter);
 app.use('/users', userRouter);
+app.use('/imageUpload', uploadRouter);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
