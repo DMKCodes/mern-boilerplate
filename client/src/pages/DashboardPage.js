@@ -3,6 +3,7 @@ import { checkAdmin } from '../features/user/userSlice';
 import UserCard from '../features/user/UserCard';
 import AdminCard from '../features/user/AdminCard';
 import { Container, Row } from 'reactstrap';
+import Subheader from '../components/Subheader';
 
 const DashboardPage = ({ user }) => {
     const isAdmin = useSelector(checkAdmin);
@@ -10,6 +11,7 @@ const DashboardPage = ({ user }) => {
 
     return (
         <Container fluid>
+            <Subheader current={`Dashboard: ${username}`}/>
             <Row className='mt-3'>
                 <h2>Welcome, {username}!</h2>
             </Row>

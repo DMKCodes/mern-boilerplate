@@ -14,7 +14,10 @@ function App() {
             <Header />
             <Routes>
                 <Route path='/' element={<HomePage />} />
-                <Route path='/dashboard' element={<DashboardPage user={currentUser} />} />
+                <Route 
+                    path='/dashboard' 
+                    element={<DashboardPage user={currentUser} />}
+                />
             </Routes>
         </div>
     );
