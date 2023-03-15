@@ -63,9 +63,9 @@ const RegisterLoginModal = () => {
                 setError(false);
             }, '2000');
         } catch (error) {
-            if (error.response && error.response.data.message) {
+            if (error.response && error.response.data.error) {
                 setError(true);
-                setErrorMsg(`${error.response.data.message}, please try again.  Redirecting...`);
+                setErrorMsg(`${error.response.data.error}, please try again.  Redirecting...`);
                 setTimeout(() => {
                     setModalOpen(false);
                     setError(false);
