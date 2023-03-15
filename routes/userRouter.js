@@ -3,10 +3,9 @@ const userRouter = express.Router();
 const User = require('../models/user');
 const passport = require('passport');
 const authenticate = require('../authenticate');
-const cors = require('./cors');
 
 userRouter.route('/')
-.get([cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin], async (req, res, next) => {
+.get(authenticate.verifyUser, authenticate.verifyAdmin, async (req, res, next) => {
     try {
         const allUsers = await User.find();
         res.statusCode = 200;
@@ -16,7 +15,7 @@ userRouter.route('/')
         return next(err);
     }
 })
-.delete([cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin], async (req, res, next) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, async (req, res, next) => {
     try {
         await User.deleteMany();
         res.statusCode = 200;
@@ -28,7 +27,7 @@ userRouter.route('/')
 });
 
 userRouter.route('/:userId')
-.get([cors.corsWithOptions, authenticate.verifyUser], async (req, res, next) => {
+.get(authenticate.verifyUser, async (req, res, next) => {
     try {
         if (req.user._id.equals(req.params.userId) || req.user.admin) {
             const user = await User.findById(req.params.userId);
@@ -51,7 +50,7 @@ userRouter.route('/:userId')
         return next(err);
     }
 })
-.put([cors.corsWithOptions, authenticate.verifyUser], async (req, res, next) => {
+.put(authenticate.verifyUser, async (req, res, next) => {
     try {
         if (req.user._id.equals(req.params.userId) || req.user.admin) {
             const updatedUser = await User.findByIdAndUpdate(req.params.userId, {
@@ -76,7 +75,7 @@ userRouter.route('/:userId')
         return next(err);
     }
 })
-.delete([cors.corsWithOptions, authenticate.verifyUser], async (req, res, next) => {
+.delete(authenticate.verifyUser, async (req, res, next) => {
     try {
         if (req.user._id.equals(req.params.userId) || req.user.admin) {
             const deletedUser = await User.findByIdAndDelete(req.params.userId);
@@ -100,33 +99,64 @@ userRouter.route('/:userId')
     }
 });
 
-userRouter.post('/register', cors.corsWithOptions, (req, res, next) => {
+userRouter.post('/register', async (req, res, next) => {
     try {
-        User.register(new User(
-            { username: req.body.username, email: req.body.email, admin: req.body.admin }), 
-            req.body.password,
-            () => {
-                passport.authenticate('local')(req, res, () => {
-                    res.statusCode = 200;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.json({ success: true, status: 'Registration successful.' });
-                });
-            }
-        );
+        const userExists = await User.findOne({ $or: [{ username: req.body.username}, { email: req.body.email }] });
+        if (!userExists) {
+            User.register(new User(
+                { username: req.body.username, email: req.body.email, admin: req.body.admin }), 
+                req.body.password,
+                () => {
+                    passport.authenticate('local')(req, res, () => {
+                        res.setHeader('Content-Type', 'application/json');
+                        res.status(200).json({ success: true, status: 'Registration successful.' });
+                    });
+                }
+            );
+        } else {
+            res.status(409).json({ 
+                error: 'This username or email is linked to an existing account. Please try again. Redirecting...'
+            });
+        }
     } catch (err) {
         return next(err);
     }
 });
 
-userRouter.post('/login', [cors.corsWithOptions, passport.authenticate('local')], (req, res, next) => {
-    try {
-        const token = authenticate.getToken({ _id: req.user._id });
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({ success: true, token: token, status: 'You have successfully logged in.' });
-    } catch (err) {
-        return next(err);
-    }
+userRouter.post('/login', (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            if (info.message === 'Missing credentials') {
+                res.status(400).json({ success: false, message: 'Username and password are required' });
+            } else if (info.message === 'Password or username is incorrect') {
+                res.status(401).json({ success: false, message: 'Username or password is incorrect' });
+            }
+        } else {
+            try {
+                const token = authenticate.getToken({ _id: user._id });
+                res.setHeader('Content-Type', 'application/json');
+                if (user.admin) {
+                    res.status(200).json({ 
+                        success: true, 
+                        token: token, 
+                        admin: true, 
+                        status: 'You have successfully logged in.'
+                    });
+                } else {
+                    res.status(200).json({ 
+                        success: true, 
+                        token: token, 
+                        status: 'You have successfully logged in.'
+                    });
+                }
+            } catch (err) {
+                return next(err);
+            }
+        }
+    })(req, res, next);
 });
 
 module.exports = userRouter;

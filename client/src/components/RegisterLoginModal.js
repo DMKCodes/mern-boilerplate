@@ -19,37 +19,66 @@ import { Formik, Field, Form } from 'formik';
 const RegisterLoginModal = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('register');
+    const [error, setError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
     const currentUser = useSelector(selectCurrentUser);
     const dispatch = useDispatch();
 
-    const handleRegisterSubmit = (values) => {
-        axios.post('http://localhost:5000/users/register', values)
-        .then(response => {
-            if (response.data.success === true) {
-                if (values.admin) {
-                    dispatch(setAdmin(true));
-                }
-                handleLoginSubmit({ username: values.username, password: values.password });
-            }
-        })
-        .catch(err => console.log(err));
-    };
-
-    const handleLoginSubmit = (values) => {
-        axios.post('http://localhost:5000/users/login', values)
-        .then(response => {
-            if (response.data.success === true) {
-                const user = {
-                    username: values.username,
-                    token: response.data.token
-                };
-                dispatch(setCurrentUser(user));
+    const handleRegisterSubmit = async (values) => {
+        try {
+            await axios.post('http://localhost:5000/users/register', values);
+            handleLoginSubmit(values);
+        } catch (error) {
+            if (error.response && error.response.status === 409) {
+                setError(true);
+                setErrorMsg(error.response.data.error);
                 setTimeout(() => {
                     setModalOpen(false);
-                }, '2000')
+                    setError(false);
+                }, '3000');
+            } else {
+                setError(true);
+                setErrorMsg('Internal error, please try again.  Redirecting...');
+                setTimeout(() => {
+                    setModalOpen(false);
+                    setError(false);
+                }, '3000');
             }
-        })
-        .catch(err => console.log(err));
+        }};
+
+    const handleLoginSubmit = async (values) => {
+        try {
+            const response = await axios.post('http://localhost:5000/users/login', values);
+            if (response.admin) {
+                dispatch(setAdmin(true));
+            }
+            const user = {
+                username: values.username,
+                email: values.email,
+                token: response.data.token
+            };
+            dispatch(setCurrentUser(user));
+            setTimeout(() => {
+                setModalOpen(false);
+                setError(false);
+            }, '2000');
+        } catch (error) {
+            if (error.response && error.response.data.message) {
+                setError(true);
+                setErrorMsg(`${error.response.data.message}, please try again.  Redirecting...`);
+                setTimeout(() => {
+                    setModalOpen(false);
+                    setError(false);
+                }, '3000');
+            } else {
+                setError(true);
+                setErrorMsg('Internal error, please try again.  Redirecting...');
+                setTimeout(() => {
+                    setModalOpen(false);
+                    setError(false);
+                }, '3000');
+            }
+        }
     };
 
     return (
@@ -86,7 +115,9 @@ const RegisterLoginModal = () => {
                 </Nav>
                 <TabContent activeTab={activeTab}>
                     <TabPane tabId='register'>
-                        {!currentUser ? (
+                        { error ? (
+                            <h4 className='p-3'>{errorMsg}</h4>
+                        ) : !currentUser ? (
                             <Formik
                                 initialValues={{
                                     username: '',
@@ -157,11 +188,13 @@ const RegisterLoginModal = () => {
                                 </Form>
                             </Formik>
                         ) : (
-                            <h4 className='m-3'>Registration successful.  Redirecting...</h4>
+                            <h4 className='p-3'>Registration successful.  Logging in...</h4>
                         )}
                     </TabPane>
                     <TabPane tabId='login'>
-                        {!currentUser ? (
+                        { error ? (
+                            <h4 className='p-3'>{errorMsg}</h4>
+                        ) : !currentUser ? (
                             <Formik
                                 initialValues={{
                                     username: '',

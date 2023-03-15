@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Subheader = ({ current }) => {
     return (
         <Row>
-            <Col>
+            <Col className='pt-2'>
                 <Breadcrumb>
                     <BreadcrumbItem>
                         <Link to='/'>Home</Link>
