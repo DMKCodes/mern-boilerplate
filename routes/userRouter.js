@@ -130,13 +130,15 @@ userRouter.post('/login', (req, res, next) => {
                 res.setHeader('Content-Type', 'application/json');
                 if (user.admin) {
                     res.status(200).json({ 
-                        token: token, 
+                        token: token,
+                        id: user._id,
                         admin: true, 
                         status: 'You have successfully logged in.'
                     });
                 } else {
                     res.status(200).json({ 
-                        token: token, 
+                        token: token,
+                        id: user._id,
                         status: 'You have successfully logged in.'
                     });
                 }

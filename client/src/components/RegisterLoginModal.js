@@ -25,7 +25,7 @@ const RegisterLoginModal = () => {
     const currentUser = useSelector(selectCurrentUser);
     const dispatch = useDispatch();
 
-    const valSchema = yup.object().shape({
+    const registerSchema = yup.object().shape({
         email: yup
             .string()
             .email('Invalid email format.')
@@ -45,6 +45,21 @@ const RegisterLoginModal = () => {
         confirmPassword: yup
             .string()
             .oneOf([yup.ref('password'), null], 'Passwords do not match.')
+            .required('Required.')
+    });
+
+    const loginSchema = yup.object().shape({
+        username: yup
+            .string()
+            .min(4, 'Must be at least 4 characters.')
+            .max(16, 'Cannot be more than 16 characters.')
+            .required('Required.'),
+        password: yup
+            .string()
+            .matches(
+                /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[0-9]){1})((?=.*[A-Z]){1}).*$/,
+                "Password must contain at least 8 characters, one uppercase, one number and one special character."
+            )
             .required('Required.')
     });
 
@@ -77,6 +92,7 @@ const RegisterLoginModal = () => {
                 dispatch(setAdmin(true));
             }
             const user = {
+                id: response.data.id,
                 username: values.username,
                 email: values.email,
                 token: response.data.token
@@ -149,8 +165,7 @@ const RegisterLoginModal = () => {
                                     email: '',
                                     admin: false
                                 }}
-                                // onBlur={handleBlur}
-                                validationSchema={valSchema}
+                                validationSchema={registerSchema}
                                 onSubmit={handleRegisterSubmit}
                             >
                                 {(formik) => {
@@ -272,7 +287,7 @@ const RegisterLoginModal = () => {
                                     username: '',
                                     password: ''
                                 }}
-                                validationSchema={valSchema}
+                                validationSchema={loginSchema}
                                 onSubmit={handleLoginSubmit}
                             >
                                 {(formik) => {
