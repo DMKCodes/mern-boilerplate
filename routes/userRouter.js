@@ -14,62 +14,6 @@ userRouter.route('/')
         return next(err);
     }
 })
-userRouter.post('/register', async (req, res, next) => {
-    try {
-        const userExists = await User.findOne({ $or: [{ username: req.body.username}, { email: req.body.email }] });
-        if (!userExists) {
-            User.register(new User(
-                { username: req.body.username, email: req.body.email, admin: req.body.admin }), 
-                req.body.password,
-                () => {
-                    passport.authenticate('local')(req, res, () => {
-                        res.setHeader('Content-Type', 'application/json');
-                        res.status(200).json({ status: 'Registration successful.' });
-                    });
-                }
-            );
-        } else {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(409).json({ error: 'This username or email is linked to an existing account. Please try again. Redirecting...' });
-        }
-    } catch (err) {
-        return next(err);
-    }
-})
-userRouter.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) {
-            return next(err);
-        }
-        if (!user) {
-            res.setHeader('Content-Type', 'application/json');
-            if (info.message === 'Missing credentials') {
-                res.status(400).json({ error: 'Username and password are required' });
-            } else if (info.message === 'Password or username is incorrect') {
-                res.status(401).json({ error: 'Username or password is incorrect' });
-            }
-        } else {
-            try {
-                const token = authenticate.getToken({ _id: user._id });
-                res.setHeader('Content-Type', 'application/json');
-                if (user.admin) {
-                    res.status(200).json({ 
-                        token: token, 
-                        admin: true, 
-                        status: 'You have successfully logged in.'
-                    });
-                } else {
-                    res.status(200).json({ 
-                        token: token, 
-                        status: 'You have successfully logged in.'
-                    });
-                }
-            } catch (err) {
-                return next(err);
-            }
-        }
-    })(req, res, next);
-})
 .delete(authenticate.verifyUser, authenticate.verifyAdmin, async (req, res, next) => {
     try {
         const deleteResult = await User.deleteMany({ _id: { $ne: req.user._id } });
@@ -144,5 +88,63 @@ userRouter.route('/:userId')
         return next(err);
     }
 });
+
+userRouter.post('/register', async (req, res, next) => {
+    try {
+        const userExists = await User.findOne({ $or: [{ username: req.body.username}, { email: req.body.email }] });
+        if (!userExists) {
+            User.register(new User(
+                { username: req.body.username, email: req.body.email, admin: req.body.admin }), 
+                req.body.password,
+                () => {
+                    passport.authenticate('local')(req, res, () => {
+                        res.setHeader('Content-Type', 'application/json');
+                        res.status(200).json({ status: 'Registration successful.' });
+                    });
+                }
+            );
+        } else {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(409).json({ error: 'This username or email is linked to an existing account. Please try again. Redirecting...' });
+        }
+    } catch (err) {
+        return next(err);
+    }
+});
+
+userRouter.post('/login', (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            res.setHeader('Content-Type', 'application/json');
+            if (info.message === 'Missing credentials') {
+                res.status(400).json({ error: 'Username and password are required' });
+            } else if (info.message === 'Password or username is incorrect') {
+                res.status(401).json({ error: 'Username or password is incorrect' });
+            }
+        } else {
+            try {
+                const token = authenticate.getToken({ _id: user._id });
+                res.setHeader('Content-Type', 'application/json');
+                if (user.admin) {
+                    res.status(200).json({ 
+                        token: token, 
+                        admin: true, 
+                        status: 'You have successfully logged in.'
+                    });
+                } else {
+                    res.status(200).json({ 
+                        token: token, 
+                        status: 'You have successfully logged in.'
+                    });
+                }
+            } catch (err) {
+                return next(err);
+            }
+        }
+    })(req, res, next);
+})
 
 module.exports = userRouter;
