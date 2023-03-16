@@ -145,6 +145,6 @@ userRouter.post('/login', (req, res, next) => {
             }
         }
     })(req, res, next);
-})
+});
 
 module.exports = userRouter;
