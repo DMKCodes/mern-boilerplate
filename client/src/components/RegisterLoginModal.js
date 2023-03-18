@@ -10,6 +10,7 @@ import {
     TabContent,
     TabPane
 } from 'reactstrap';
+import UserDropdown from './UserDropdown';
 import RegisterForm from './RegisterForm';
 import LoginForm from './LoginForm';
 
@@ -22,11 +23,9 @@ const RegisterLoginModal = () => {
 
     return (
         <>
-            <span className='navbar-text ml-auto'>
+            <span className='navbar-text me-md-5'>
                 {currentUser ? (
-                    <div>
-                        {currentUser.username}
-                    </div>
+                    <UserDropdown />
                 ) : (
                     <Button outline color='light' onClick={() => setModalOpen(true)}>
                         Log In
