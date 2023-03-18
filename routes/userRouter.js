@@ -51,15 +51,30 @@ userRouter.route('/:userId')
 .put(authenticate.verifyUser, async (req, res, next) => {
     try {
         if (req.user._id.equals(req.params.userId) || req.user.admin) {
-            const updatedUser = await User.findByIdAndUpdate(req.params.userId, {
-                $set: req.body
-            }, {new: true});
+            if (req.body.password) {
+                const newPassword = req.body.password;
+                const user = await User.findById(req.params.userId);
+                if (user) {
+                    await user.setPassword(newPassword);
+                    const updatedUser = await user.save();
 
-            res.setHeader('Content-Type', 'application/json');
-            if (updatedUser) {
-                res.status(200).json({ updatedUser, status: 'User successfully updated.' });
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json({ updatedUser, status: 'Password successfully changed.' });
+                } else {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(404).json({ error: 'This user does not exist.' });
+                }
             } else {
-                res.status(404).json({ error: 'This user does not exist.' });
+                const updatedUser = await User.findByIdAndUpdate(req.params.userId, {
+                    $set: req.body
+                }, {new: true});
+
+                res.setHeader('Content-Type', 'application/json');
+                if (updatedUser) {
+                    res.status(200).json({ updatedUser, status: 'User successfully updated.' });
+                } else {
+                    res.status(404).json({ error: 'This user does not exist.' });
+                }
             }
         } else {
             res.setHeader('Content-Type', 'application/json');

@@ -74,18 +74,18 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
                                 Username: 
                             </Label>
                             <Col md='9'>
-                            <Field 
-                                name='username'
-                                placeholder='username'
-                                className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
-                            />
-                            {errors.username && touched.username ? (
-                                <ErrorMessage
-                                    component='span'
+                                <Field 
                                     name='username'
-                                    className='invalid-feedback'
+                                    placeholder='username'
+                                    className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
                                 />
-                            ) : null}
+                                {errors.username && touched.username ? (
+                                    <ErrorMessage
+                                        component='span'
+                                        name='username'
+                                        className='invalid-feedback'
+                                    />
+                                ) : null}
                             </Col>
                         </FormGroup>
                         <FormGroup row>
@@ -93,18 +93,18 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
                                 Password: 
                             </Label>
                             <Col md='9'>
-                            <Field 
-                                name='password'
-                                placeholder='password'
-                                className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
-                            />
-                            {errors.password && touched.password ? (
-                                <ErrorMessage
-                                    component='span'
+                                <Field 
                                     name='password'
-                                    className='invalid-feedback'
+                                    placeholder='password'
+                                    className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
                                 />
-                            ) : null}
+                                {errors.password && touched.password ? (
+                                    <ErrorMessage
+                                        component='span'
+                                        name='password'
+                                        className='invalid-feedback'
+                                    />
+                                ) : null}
                             </Col>
                         </FormGroup>
                         <FormGroup row>
@@ -112,7 +112,7 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
                                 <Button type='submit' color='primary' className='me-3'>
                                     Login
                                 </Button>
-                                <Button  type='button' color='secondary' onClick={() => setModalOpen(false)}>
+                                <Button type='button' color='secondary' onClick={() => setModalOpen(false)}>
                                     Cancel
                                 </Button>
                             </Col>

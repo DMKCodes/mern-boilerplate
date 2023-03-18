@@ -15,6 +15,13 @@ const userSlice = createSlice({
                 currentUser: action.payload
             });
         },
+        clearCurrentUser: (state) => {
+            return ({
+                ...state,
+                currentUser: null,
+                isAdmin: false
+            });
+        },
         setAdmin: (state, action) => {
             return ({
                 ...state,
@@ -26,7 +33,7 @@ const userSlice = createSlice({
 
 export const userReducer = userSlice.reducer;
 
-export const { setCurrentUser, setAdmin } = userSlice.actions;
+export const { setCurrentUser, clearCurrentUser, setAdmin } = userSlice.actions;
 
 export const selectCurrentUser = (state) => {
     return state.user.currentUser;

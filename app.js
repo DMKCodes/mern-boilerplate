@@ -4,6 +4,7 @@ const path = require('path');
 const logger = require('morgan');
 const passport = require('passport');
 const config = require('./config');
+const cors = require('cors');
 
 const indexRouter = require('./routes/indexRouter');
 const userRouter = require('./routes/userRouter');
@@ -31,11 +32,14 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    methods: 'GET,PUT,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 app.use(passport.initialize());
 
