@@ -1,15 +1,15 @@
 import {
+    Row,
+    Col,
     Card,
     CardBody,
     CardTitle,
-    CardSubtitle,
     CardText,
     CardFooter,
     Button
 } from 'reactstrap';
 
-const UserCard = ({ user }) => {
-    const { username, email, token, id } = user;
+const UserCard = ( _id ) => {
 
     return (
         <Card
@@ -20,18 +20,27 @@ const UserCard = ({ user }) => {
                 <CardTitle>
                     <h4 className='py-2'>User Panel</h4>
                 </CardTitle>
-                <CardSubtitle>
-                    <p className='mb-0'>Username: {username}</p>
-                    <p>Email: {email}</p>
-                </CardSubtitle>
                 <CardText>
-                    User ID: {id}<br/>
-                    JWT Token: {token}
+                    <div>Username:</div>
+                    <div>Email:</div>
+                    <div>User ID:</div>
+                    <div>JWT Token:</div>
                 </CardText>
                 <CardFooter className='d-flex justify-content-around'>
-                    <Button></Button>
-                    <Button></Button>
-                    <Button></Button>
+                    <Row>
+                        <Col md='4' xs='6'>
+                            <Button>Populate</Button>
+                            <p>GET /users/:userId</p>
+                        </Col>
+                        <Col md='4' xs='6'>
+                            <Button>Change</Button>
+                            <p>PUT /users/:userId</p>
+                        </Col>                        
+                        <Col md='4' xs='6'>
+                            <Button>Delete</Button>
+                            <p>DEL /users/:userId</p>
+                        </Col>
+                    </Row>
                 </CardFooter>
             </CardBody>
         </Card>

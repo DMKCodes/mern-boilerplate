@@ -1,13 +1,14 @@
 import { useSelector } from 'react-redux';
-import { checkAdmin } from '../features/user/userSlice';
+import { checkAdmin, selectCurrentUser } from '../features/user/userSlice';
 import { Container, Row, Col } from 'reactstrap';
 import Subheader from '../components/Subheader';
 import UserCard from '../features/user/UserCard';
 import AdminCard from '../features/user/AdminCard';
 
-const DashboardPage = ({ user }) => {
+const DashboardPage = () => {
+    const currentUser = useSelector(selectCurrentUser);
     const isAdmin = useSelector(checkAdmin);
-    const { username } = user;
+    const { username, _id } = currentUser;
 
     return (
         <Container fluid>
@@ -17,13 +18,13 @@ const DashboardPage = ({ user }) => {
             </Row>
             <Row className='d-flex justify-content-center'>
                 <Col xs='10' md='8' className='pt-3'>
-                    <UserCard user={user} />
+                    <UserCard _id={_id} />
                 </Col>
             </Row>
             {isAdmin &&
                 <Row className='d-flex justify-content-center'>
                     <Col xs='10' md='8' className='pt-3'>
-                        <AdminCard user={user} />
+                        <AdminCard isAdmin={isAdmin} />
                     </Col>
                 </Row>
             }

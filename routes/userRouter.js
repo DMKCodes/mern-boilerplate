@@ -119,10 +119,10 @@ userRouter.post('/login', (req, res, next) => {
         }
         if (!user) {
             res.setHeader('Content-Type', 'application/json');
-            if (info.message === 'Missing credentials') {
-                res.status(400).json({ error: 'Username and password are required' });
-            } else if (info.message === 'Password or username is incorrect') {
+            if (info.message === 'Password or username is incorrect') {
                 res.status(401).json({ error: 'Username or password is incorrect' });
+            } else {
+                return next(err);
             }
         } else {
             try {
@@ -130,15 +130,15 @@ userRouter.post('/login', (req, res, next) => {
                 res.setHeader('Content-Type', 'application/json');
                 if (user.admin) {
                     res.status(200).json({ 
-                        token: token,
-                        id: user._id,
+                        token,
+                        user,
                         admin: true, 
                         status: 'You have successfully logged in.'
                     });
                 } else {
                     res.status(200).json({ 
                         token: token,
-                        id: user._id,
+                        user,
                         status: 'You have successfully logged in.'
                     });
                 }

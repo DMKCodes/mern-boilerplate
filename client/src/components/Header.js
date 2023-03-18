@@ -18,9 +18,9 @@ const Header = () => {
 
     return (
         <Navbar dark color='success' sticky='top' expand='md'>
-            <NavbarBrand className='ms-5' href='/'>
+            <NavLink className='nav-link ms-5' to='/' style={{ color: 'white' }}>
                 <h3 className='mt-1'>MERN Boilerplate</h3>
-            </NavbarBrand>
+            </NavLink>
             <NavbarToggler onClick={() => setMenuOpen(!menuOpen)} />
             <Collapse isOpen={menuOpen} navbar className='me-5'>
                 <Nav className='ms-auto' navbar>
