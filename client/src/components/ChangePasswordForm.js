@@ -2,7 +2,7 @@ import { Col, FormGroup, Label, Button } from 'reactstrap';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 
-const ChangePasswordForm = ({ putUser, _id, setChangePassword }) => {
+const ChangePasswordForm = ({ putUser, setChangePassword }) => {
     const changePasswordSchema = yup.object().shape({
         currentPassword: yup
             .string()
@@ -24,7 +24,7 @@ const ChangePasswordForm = ({ putUser, _id, setChangePassword }) => {
                 confirmNewPassword: ''
             }}
             validationSchema={changePasswordSchema}
-            onSubmit={(values) => putUser(values, _id)}
+            onSubmit={(values) => putUser(values)}
         >
             {(formik) => {
                 const { errors, touched } = formik;

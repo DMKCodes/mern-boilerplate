@@ -21,8 +21,9 @@ userRouter.route('/')
         res.setHeader('Content-Type', 'application/json');
         if (deleteResult.deletedCount === 0) {
             res.status(404).json({ status: 'No other users found to delete.' });
+        } else {
+            res.status(200).json({ status: 'All users successfully deleted.'});
         }
-        res.status(200).json({ status: 'All users successfully deleted.'});
     } catch (err) {
         return next(err);
     }

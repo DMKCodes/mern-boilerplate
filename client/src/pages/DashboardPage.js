@@ -2,8 +2,8 @@ import { useSelector } from 'react-redux';
 import { checkAdmin, selectCurrentUser } from '../features/user/userSlice';
 import { Container, Row, Col } from 'reactstrap';
 import Subheader from '../components/Subheader';
-import UserCard from '../components/UserCard';
-import AdminCard from '../components/AdminCard';
+import UserPanel from '../components/UserPanel';
+import AdminPanel from '../components/AdminPanel';
 
 const DashboardPage = () => {
     const currentUser = useSelector(selectCurrentUser);
@@ -11,20 +11,20 @@ const DashboardPage = () => {
     const { username } = currentUser;
 
     return (
-        <Container fluid>
+        <Container fluid className='mt-3'>
             <Subheader current={`Dashboard: ${username}`}/>
             <Row className='pt-1'>
                 <h2>Welcome, {username}!</h2>
             </Row>
-            <Row className='d-flex justify-content-center'>
+            <Row className='d-flex justify-content-center mb-5'>
                 <Col xs='10' md='8' className='pt-3'>
-                    <UserCard currentUser={currentUser} />
+                    <UserPanel currentUser={currentUser} />
                 </Col>
             </Row>
             {isAdmin &&
                 <Row className='d-flex justify-content-center'>
                     <Col xs='10' md='8' className='pt-3'>
-                        <AdminCard />
+                        <AdminPanel currentUser={currentUser} />
                     </Col>
                 </Row>
             }

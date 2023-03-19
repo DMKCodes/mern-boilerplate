@@ -3,6 +3,7 @@ import './App.css';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
+import Footer from './components/Footer';
 
 function App() {
     return (
@@ -15,6 +16,7 @@ function App() {
                     element={<DashboardPage />}
                 />
             </Routes>
+            <Footer />
         </div>
     );
 }

@@ -1,139 +1,93 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { clearCurrentUser } from '../features/user/userSlice';
-import { Container, Row, Col, Button } from 'reactstrap';
+import { selectCurrentUser, clearCurrentUser } from '../features/user/userSlice';
+import { Row, Col, Button } from 'reactstrap';
+import ChangeUsernameForm from './ChangeUsernameForm';
 import axios from 'axios';
-import ChangePasswordForm from './ChangePasswordForm';
 
-const UserCard = ({ currentUser }) => {
-    const [fetchedUser, setFetchedUser] = useState({
-        _id: '',
-        username: '',
-        email: ''
-    });
-    const [changePassword, setChangePassword] = useState(false);
-    const [deleteAccount, setDeleteAccount] = useState(false);
-    const [passwordChanged, setPasswordChanged] = useState(false);
-    const [accountDeleted, setAccountDeleted] = useState(false);
-    
+const UserCard = ({ user, token, setStatusMsg }) => {
+    const [changeUsername, setChangeUsername] = useState(false);
+    const { _id, username, email, admin } = user;
+    const currentUser = useSelector(selectCurrentUser);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { _id, token } = currentUser;
-
-    const getUser = async (_id) => {
+    const putUserUsername = async (values) => {
         try {
-            const response = await axios.get(
-                `http://localhost:5000/users/${_id}`, 
+            const response = await axios.put(
+                `http://localhost:5000/users/${_id}`,
+                { username: values.newUsername },
                 { headers: { 'Authorization': `Bearer ${token}` }}
             );
-            const user = response.data.user;
-            setFetchedUser(user);
-        } catch (error) {
-            console.log(error);
-        };
-    };
+            console.log(response);
 
-    const putUser = async (values, _id) => {
-        try {
-            await axios.put(
-                `http://localhost:5000/users/${_id}`,
-                { password: values.newPassword },
-                { headers: { 'Authorization': `Bearer ${token}` }}
-            )
-            setChangePassword(false);
-            setPasswordChanged(true);
+            setStatusMsg('Username succesfully changed. Repopulate to see changes.');
+            setChangeUsername(false);
         } catch (error) {
-            console.log(error);
+            setStatusMsg('Internal error.  Please try again later.');
         }
     };
 
-    const delUser = async (_id) => {
+    const delUser = async () => {
         try {
             await axios.delete(
                 `http://localhost:5000/users/${_id}`,
                 { headers: { 'Authorization': `Bearer ${token}` }}
             );
-
-            setDeleteAccount(false);
-            setAccountDeleted(true);
             
-            setTimeout(() => {
-                navigate('/');
-                dispatch(clearCurrentUser());
-            }, '2000');
+            if (currentUser._id === _id) {
+                setStatusMsg('Account successfully deleted.  Redirecting...');
+                setTimeout(() => {
+                    navigate('/');
+                    dispatch(clearCurrentUser());
+                }, '2000');
+            } else {
+                setStatusMsg('User successfully deleted. Repopulate to see changes.');
+            }
         } catch (error) {
             console.log(error);
         }
     };
 
     return (
-        <Container>
-            <Row className='border'>
-                <h4 className='pt-2'>User Panel</h4>
-                <p>Use this panel to view and modify your own account.</p>
-            </Row>
-            <Row className='pt-3 border border-top-0'>
-                <Col xs='3'>
-                    <Button outline color='primary' type='submit' onClick={() => getUser(_id)}>
-                        Populate Details
+        <Col xl='5' md='8' key={_id} className='m-1 p-2 border'>
+            <p><b>Username</b>: {username}</p>
+            <p className='mb-0'>ID: {_id}</p>
+            <p className='mb-0'>Email: {email}</p>
+            <p>Admin: {admin ? 'Yes' : 'No'}</p>
+            <Row className='justify-content-center'>
+                {!changeUsername ? (
+                    <Button 
+                        outline 
+                        type='submit' 
+                        color='warning'
+                        style={{ width: '175px' }}
+                        onClick={() => setChangeUsername(true)}
+                    >
+                        Change Username
                     </Button>
-                    <p>GET /users/:userId</p>
-                </Col>
-                <Col xs='9'>
-                    <b>User ID</b>: {fetchedUser._id}<br/>
-                    <b>Username</b>: {fetchedUser.username}<br/>
-                    <b>Email</b>: {fetchedUser.email}<br/>
-                </Col>
+                ) : (
+                    <ChangeUsernameForm 
+                        setChangeUsername={setChangeUsername} 
+                        putUserUsername={putUserUsername} 
+                    />
+                )}
             </Row>
-            <Row className='pt-3 border border-top-0'>
-                <Col xs='3'>
-                    <Button outline color='warning' type='submit' onClick={() => setChangePassword(true)}>
-                        Change Password
+            <Row className='mt-2 justify-content-center'>
+                <Col md='6'>
+                    <Button
+                        outline
+                        type='submit'
+                        color='danger'
+                        onClick={() => delUser()}
+                    >
+                        Delete User
                     </Button>
-                    <p>PUT /users/:userId</p>
-                </Col>
-                <Col xs='9'>
-                    {changePassword ? (
-                        <ChangePasswordForm 
-                            putUser={putUser} 
-                            _id={_id}
-                            setChangePassword={setChangePassword} 
-                        />
-                    ) : passwordChanged ? (
-                        <div>Your password has been successfully changed.</div>
-                    ) : null}
-                </Col>  
-            </Row>
-            <Row className='pt-3 border border-top-0'>
-                <Col xs='3'>
-                    <Button outline color='danger' type='submit' onClick={() => setDeleteAccount(true)}>
-                        Delete Account
-                    </Button>
-                    <p>DEL /users/:userId</p>
-                </Col>
-                <Col xs='9'>
-                    {deleteAccount ? (
-                        <>
-                            <div className='mb-2'>
-                                Are you sure you want to delete your account?{' '}
-                                This operation is <b style={{ color: 'red' }}>permanent</b>.
-                            </div>
-                            <Button outline color='danger' className='me-3' type='submit' onClick={() => delUser(_id)}>
-                                Delete
-                            </Button>
-                            <Button outline type='button' onClick={() => setDeleteAccount(false)}>
-                                Cancel
-                            </Button>
-                        </>
-                    ) : accountDeleted ? (
-                        <div>Your account has been deleted.  Redirecting...</div>
-                    ) : null
-                    }
                 </Col>
             </Row>
-        </Container>
+        </Col>
     );
 };
 
