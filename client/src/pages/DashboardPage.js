@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { checkAdmin, selectCurrentUser } from '../features/user/userSlice';
+import { checkAdmin, selectCurrentUser } from '../features/userSlice';
 import { Container, Row, Col } from 'reactstrap';
 import Subheader from '../components/Subheader';
 import UserPanel from '../components/UserPanel';

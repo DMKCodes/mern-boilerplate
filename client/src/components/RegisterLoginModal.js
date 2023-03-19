@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '../features/user/userSlice';
+import { selectCurrentUser } from '../features/userSlice';
 import {
     Button,
     Modal,

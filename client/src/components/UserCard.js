@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { selectCurrentUser, clearCurrentUser } from '../features/user/userSlice';
+import { selectCurrentUser, clearCurrentUser } from '../features/userSlice';
 import { Row, Col, Button } from 'reactstrap';
 import ChangeUsernameForm from './ChangeUsernameForm';
 import axios from 'axios';

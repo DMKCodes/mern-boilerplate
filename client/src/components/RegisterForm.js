@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { setCurrentUser, setAdmin } from '../features/user/userSlice';
+import { setCurrentUser, setAdmin } from '../features/userSlice';
 import { Col, Button, FormGroup, Label } from 'reactstrap';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import axios from 'axios';

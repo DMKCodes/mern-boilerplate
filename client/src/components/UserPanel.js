@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { clearCurrentUser } from '../features/user/userSlice';
+import { clearCurrentUser } from '../features/userSlice';
 import { Container, Row, Col, Button } from 'reactstrap';
 import axios from 'axios';
 import ChangePasswordForm from './ChangePasswordForm';
