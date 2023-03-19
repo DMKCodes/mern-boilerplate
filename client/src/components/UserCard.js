@@ -23,7 +23,7 @@ const UserCard = ({ user, token, setStatusMsg }) => {
             );
             console.log(response);
 
-            setStatusMsg('Username succesfully changed. Repopulate to see changes.');
+            setStatusMsg('Username successfully changed. Repopulate to see changes.');
             setChangeUsername(false);
         } catch (error) {
             setStatusMsg('Internal error.  Please try again later.');
