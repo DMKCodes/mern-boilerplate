@@ -8,6 +8,9 @@ import axios from 'axios';
 
 const UserCard = ({ user, token, setStatusMsg }) => {
     const [changeUsername, setChangeUsername] = useState(false);
+    const [usernameChanged, setUsernameChanged] = useState(false);
+    const [userDeleted, setUserDeleted] = useState(false);
+
     const { _id, username, email, admin } = user;
     const currentUser = useSelector(selectCurrentUser);
 
@@ -23,8 +26,8 @@ const UserCard = ({ user, token, setStatusMsg }) => {
             );
             console.log(response);
 
-            setStatusMsg('Username successfully changed. Repopulate to see changes.');
             setChangeUsername(false);
+            setUsernameChanged(true);
         } catch (error) {
             setStatusMsg('Internal error.  Please try again later.');
         }
@@ -38,13 +41,13 @@ const UserCard = ({ user, token, setStatusMsg }) => {
             );
             
             if (currentUser._id === _id) {
-                setStatusMsg('Account successfully deleted.  Redirecting...');
+                alert('Account successfully deleted.  Continue to homepage?');
                 setTimeout(() => {
                     navigate('/');
                     dispatch(clearCurrentUser());
                 }, '2000');
             } else {
-                setStatusMsg('User successfully deleted. Repopulate to see changes.');
+                setUserDeleted(true);
             }
         } catch (error) {
             console.log(error);
@@ -58,33 +61,39 @@ const UserCard = ({ user, token, setStatusMsg }) => {
             <p className='mb-0'>Email: {email}</p>
             <p>Admin: {admin ? 'Yes' : 'No'}</p>
             <Row className='justify-content-center'>
-                {!changeUsername ? (
-                    <Button 
-                        outline 
-                        type='submit' 
-                        color='warning'
-                        style={{ width: '175px' }}
-                        onClick={() => setChangeUsername(true)}
-                    >
-                        Change Username
-                    </Button>
-                ) : (
+                {changeUsername ? (
                     <ChangeUsernameForm 
                         setChangeUsername={setChangeUsername} 
                         putUserUsername={putUserUsername} 
                     />
+                ) : usernameChanged ? (
+                    <p className='text-success'><b>Username successfully changed.</b></p>
+                ) : (
+                <Button 
+                    outline 
+                    type='submit' 
+                    color='warning'
+                    style={{ width: '175px' }}
+                    onClick={() => setChangeUsername(true)}
+                >
+                    Change Username
+                </Button>
                 )}
             </Row>
             <Row className='mt-2 justify-content-center'>
                 <Col md='6'>
-                    <Button
-                        outline
-                        type='submit'
-                        color='danger'
-                        onClick={() => delUser()}
-                    >
-                        Delete User
-                    </Button>
+                    {userDeleted ? (
+                        <p className='text-success'><b>User successfully deleted.</b></p>
+                    ) : (
+                        <Button
+                            outline
+                            type='submit'
+                            color='danger'
+                            onClick={() => delUser()}
+                        >
+                            Delete User
+                        </Button>
+                    )}
                 </Col>
             </Row>
         </Col>

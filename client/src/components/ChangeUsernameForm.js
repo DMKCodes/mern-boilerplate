@@ -27,7 +27,7 @@ const ChangeUsernameForm = ({ setChangeUsername, putUserUsername }) => {
                             <Col md='8'>
                                 <Field 
                                     name='newUsername'
-                                    placeholder='New Username'
+                                    autoComplete='off'
                                     className={`form-control${errors.newUsername && touched.newUsername ? ' is-invalid' : ''}`}
                                 />
                                 {errors.newUsername && touched.newUsername ? (

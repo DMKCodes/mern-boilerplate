@@ -19,6 +19,7 @@ const UserList = ({ token }) => {
             setStatusMsg('All users successfully populated.');
         } catch (error) {
             console.log(error);
+            setStatusMsg('Internal error.  Please try again later.');
         };
     };
 
@@ -32,7 +33,7 @@ const UserList = ({ token }) => {
             setStatusMsg('All other users successfully deleted.');
             setAllUsers('');
         } catch (error) {
-            if (error.response && error.response.status === 404) {
+            if (error.response?.status === 404) {
                 setStatusMsg('No other users to delete.');
             } else {
                 setStatusMsg('Internal error.  Please try again later.');
@@ -66,7 +67,9 @@ const UserList = ({ token }) => {
                     <p className='mb-0'>DEL /users</p>
                 </Col>
                 {statusMsg &&
-                    <Col xs='12' className='mt-3'><b>{statusMsg}</b></Col>
+                    <Col xs='12' className='mt-3'>
+                        <p className='text-success'><b>{statusMsg}</b></p>
+                    </Col>
                 }
                 </Row>
             <Row className='border border-top-0 justify-content-center p-2'>

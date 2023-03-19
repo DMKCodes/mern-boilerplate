@@ -110,7 +110,7 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
                             <Col md='9'>
                                 <Field 
                                     name='username'
-                                    placeholder='username'
+                                    autoComplete='off'
                                     className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
                                 />
                                 {errors.username && touched.username ? (
@@ -129,7 +129,7 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
                             <Col md='9'>
                                 <Field 
                                     name='password'
-                                    placeholder='password'
+                                    autoComplete='off'
                                     className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
                                 />
                                 {errors.password && touched.password ? (
@@ -143,12 +143,12 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
                         </FormGroup>
                         <FormGroup row>
                             <Label htmlFor='confirmPassword' md='3'>
-                                Password: 
+                                Confirm Password: 
                             </Label>
                             <Col md='9'>
                                 <Field 
                                     name='confirmPassword'
-                                    placeholder='confirm password'
+                                    autoComplete='off'
                                     className={`form-control${errors.confirmPassword && touched.confirmPassword ? ' is-invalid' : ''}`}
                                 />
                                 {errors.confirmPassword && touched.confirmPassword ? (
@@ -167,7 +167,7 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
                             <Col md='9'>
                                 <Field 
                                     name='email'
-                                    placeholder='email'
+                                    autoComplete='off'
                                     className={`form-control${errors.email && touched.email ? ' is-invalid' : ''}`}
                                 />
                                 {errors.email && touched.email ? (

@@ -37,7 +37,7 @@ const ChangePasswordForm = ({ putUser, setChangePassword }) => {
                             <Col md='9'>
                                 <Field 
                                     name='currentPassword'
-                                    placeholder='Current Password'
+                                    autoComplete='off'
                                     className={`form-control${errors.currentPassword && touched.currentPassword ? ' is-invalid' : ''}`}
                                 />
                                 {errors.currentPassword && touched.currentPassword ? (
@@ -56,7 +56,7 @@ const ChangePasswordForm = ({ putUser, setChangePassword }) => {
                             <Col md='9'>
                                 <Field 
                                     name='newPassword'
-                                    placeholder='New Password'
+                                    autoComplete='off'
                                     className={`form-control${errors.newPassword && touched.newPassword ? ' is-invalid' : ''}`}
                                 />
                                 {errors.newPassword && touched.newPassword ? (
@@ -75,7 +75,7 @@ const ChangePasswordForm = ({ putUser, setChangePassword }) => {
                             <Col md='9'>
                                 <Field 
                                     name='confirmNewPassword'
-                                    placeholder='Confirm New Password'
+                                    autoComplete='off'
                                     className={`form-control${errors.confirmNewPassword && touched.confirmNewPassword ? ' is-invalid' : ''}`}
                                 />
                                 {errors.confirmNewPassword && touched.confirmNewPassword ? (

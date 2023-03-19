@@ -1,16 +1,27 @@
-import { Container, Row } from 'reactstrap';
+import { Container } from 'reactstrap';
 
 const HomePage = () => {
     return (
         <Container>
-            <Row>
-                <h2 className='my-3'>Home Page</h2>
-                <p>Welcome to the MERN Boilerplate. This boilerplate app can be used as a foundation for quick, full stack MERN application development.<br />
-                Registering a new user above will grant access to the user dashboard which tests all HTML requests.<br />
-                The dashboard recognizes admin privileges and provides expanded dashboard options such as displaying all users, modifying individual users, and deleting users.<br />
-                <b>Note</b>: This boilerplate has been configured to allow you to create an admin account directly for testing. Remove these features before entering production!<br />
-                Visit <a href='https://github.com/DMKCodes/node-express-mongo-boilerplate'>the back end repository</a> for more info about server and database setup.</p>
-            </Row>
+            <h2 className='mt-3'>Overview</h2>
+            <p>Welcome to the MERN Boilerplate. This boilerplate app can be used as a foundation for quick, full stack MERN application development.</p>
+            <p>Registering a new user will grant access to the user dashboard.</p>
+            <p>Visit <a href='https://github.com/DMKCodes/node-express-mongo-boilerplate'>the back end repository</a> for more info about server and database setup.</p>
+
+            <h3>Features</h3>
+            <p>Test all API endpoints via Axios, both with and without admin privileges.</p>
+            <p>Securely register, log in, log out, and authenticate users w/ JSON Web Tokens.</p>
+            <p>Formik forms w/ comprehensive Yup validation.</p>
+            <p>Minimal styling with Reactstrap, easy to customize and make your own.</p>
+
+            <h4>Notes</h4>
+            <p>This boilerplate is not production ready until certain features have been removed - e.g., enabling admin privileges from the register form.</p>
+            <p>It is suggested to review <b>ALL</b> code, both server and client, and make the necessary changes for best security practices.</p>
+            <p>Limited accessibility features should also be revisited to ensure screen reader compatibility.</p>
+
+            <h5>License: MIT</h5>
+            <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+            <p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
         </Container>
     );
 };

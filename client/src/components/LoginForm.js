@@ -76,7 +76,7 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
                             <Col md='9'>
                                 <Field 
                                     name='username'
-                                    placeholder='username'
+                                    autoComplete='off'
                                     className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
                                 />
                                 {errors.username && touched.username ? (
@@ -95,7 +95,7 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
                             <Col md='9'>
                                 <Field 
                                     name='password'
-                                    placeholder='password'
+                                    autoComplete='off'
                                     className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
                                 />
                                 {errors.password && touched.password ? (
