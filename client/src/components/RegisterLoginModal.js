@@ -19,6 +19,7 @@ const RegisterLoginModal = () => {
     const [activeTab, setActiveTab] = useState('login');
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+
     const currentUser = useSelector(selectCurrentUser);
 
     return (
@@ -57,27 +58,28 @@ const RegisterLoginModal = () => {
                     <TabPane tabId='register'>
                         { error ? (
                             <h4 className='p-3'>{errorMsg}</h4>
-                        ) : !currentUser ? (
+                        ) : currentUser ? (
+                            <h4 className='p-3'>Registration successful! Logging in...</h4>
+                        ) : (
                             <RegisterForm 
                                 setModalOpen={setModalOpen}
                                 setError={setError}
                                 setErrorMsg={setErrorMsg}
-                            />
-                        ) : (
-                            <h4 className='p-3'>Registration successful!  Logging in...</h4>
+                                setActiveTab={setActiveTab}
+                            />  
                         )}
                     </TabPane>
                     <TabPane tabId='login'>
                         { error ? (
                             <h4 className='p-3'>{errorMsg}</h4>
-                        ) : !currentUser ? (
+                        ) : currentUser ? (
+                            <h4 className='m-3'>Login successful. Redirecting...</h4>
+                        ) : (
                             <LoginForm
                                 setModalOpen={setModalOpen}
                                 setError={setError}
                                 setErrorMsg={setErrorMsg}
                             />
-                        ) : (
-                            <h4 className='m-3'>Login successful.  Redirecting...</h4>
                         )}
                     </TabPane>
                 </TabContent>

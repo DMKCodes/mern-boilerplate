@@ -1,70 +1,109 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectCurrentUser, clearCurrentUser } from '../features/userSlice';
 import { useNavigate } from 'react-router-dom';
-import { clearCurrentUser } from '../features/userSlice';
+import { 
+    useGetUserByIdQuery, 
+    usePutUserByIdMutation, 
+    useDeleteUserByIdMutation 
+} from '../features/authApiSlice';
 import { Container, Row, Col, Button } from 'reactstrap';
-import axios from 'axios';
 import ChangePasswordForm from './ChangePasswordForm';
 
-const UserPanel = ({ currentUser }) => {
+const UserPanel = () => {
     const [fetchedUser, setFetchedUser] = useState({
         _id: '',
         username: '',
         email: ''
     });
+
+    const [getUserStarted, setGetUserStarted] = useState(false);
+
     const [changePassword, setChangePassword] = useState(false);
-    const [deleteAccount, setDeleteAccount] = useState(false);
     const [passwordChanged, setPasswordChanged] = useState(false);
+
+    const [deleteAccount, setDeleteAccount] = useState(false);
     const [accountDeleted, setAccountDeleted] = useState(false);
-    
+
+    const [error, setError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { _id, token } = currentUser;
+    const currentUser = useSelector(selectCurrentUser);
+    const { _id } = currentUser;
+
+    const getUserById = useGetUserByIdQuery(_id, { skip: !getUserStarted });
+    const [putUserById] = usePutUserByIdMutation();
+    const [deleteUserById] = useDeleteUserByIdMutation();
 
     const getUser = async () => {
+        setGetUserStarted(true);
+
         try {
-            const response = await axios.get(
-                `http://localhost:5000/users/${_id}`, 
-                { headers: { 'Authorization': `Bearer ${token}` }}
-            );
+            const response = await getUserById.refetch();
+
             const user = response.data.user;
             setFetchedUser(user);
+            setError(false);
         } catch (error) {
-            console.log(error);
+            setError(true);
+            if (!error?.data) {
+                setErrorMsg('No server response.');
+            } else if (error.data.status === 404) {
+                setErrorMsg('This user does not exist.');
+            } else if (error.data.status === 403) {
+                setErrorMsg('Not authorized to perform this operation.');
+            } else {
+                setErrorMsg('Operation failed. Please try again.');
+            }
         };
     };
 
     const putUserPassword = async (values) => {
         try {
-            await axios.put(
-                `http://localhost:5000/users/${_id}`,
-                { password: values.newPassword },
-                { headers: { 'Authorization': `Bearer ${token}` }}
-            )
+            await putUserById({ _id, newVals: { password: values.newPassword } }).unwrap();
             setChangePassword(false);
             setPasswordChanged(true);
+            setError(false);
         } catch (error) {
-            console.log(error);
+            setError(true);
+            if (!error?.data) {
+                setErrorMsg('No server response.');
+            } else if (error.data.status === 404) {
+                setErrorMsg('This user does not exist.');
+            } else if (error.data.status === 403) {
+                setErrorMsg('Not authorized to perform this operation.');
+            } else {
+                setErrorMsg('Operation failed. Please try again.');
+            }
         }
     };
 
-    const delUser = async () => {
+    const delUser = async (_id) => {
         try {
-            await axios.delete(
-                `http://localhost:5000/users/${_id}`,
-                { headers: { 'Authorization': `Bearer ${token}` }}
-            );
+            await deleteUserById({ _id }).unwrap();
 
             setDeleteAccount(false);
             setAccountDeleted(true);
+            setError(false);
             
             setTimeout(() => {
                 navigate('/');
                 dispatch(clearCurrentUser());
             }, '2000');
         } catch (error) {
-            console.log(error);
+            setError(true);
+            if (!error?.data) {
+                setErrorMsg('No server response.');
+            } else if (error.data.status === 404) {
+                setErrorMsg('This user does not exist.');
+            } else if (error.data.status === 403) {
+                setErrorMsg('Not authorized to perform this operation.');
+            } else {
+                setErrorMsg('Operation failed. Please try again.');
+            }
         }
     };
 
@@ -73,9 +112,12 @@ const UserPanel = ({ currentUser }) => {
             <Row className='border'>
                 <h4 className='pt-2'>User Panel</h4>
                 <p>Use this panel to view and modify your own account.</p>
+                {error &&
+                    <p><b>{errorMsg}</b></p>
+                }
             </Row>
             <Row className='pt-3 border border-top-0'>
-                <Col xs='3'>
+                <Col md='4' className='border-end'>
                     <Button 
                         outline 
                         color='primary' 
@@ -86,14 +128,14 @@ const UserPanel = ({ currentUser }) => {
                     </Button>
                     <p>GET /users/:userId</p>
                 </Col>
-                <Col xs='9'>
+                <Col md='8' className='pb-3'>
                     <b>User ID</b>: {fetchedUser._id}<br/>
                     <b>Username</b>: {fetchedUser.username}<br/>
                     <b>Email</b>: {fetchedUser.email}<br/>
                 </Col>
             </Row>
             <Row className='pt-3 border border-top-0'>
-                <Col xs='3'>
+                <Col md='4' className='border-end'>
                     <Button 
                         outline 
                         color='warning' 
@@ -104,7 +146,7 @@ const UserPanel = ({ currentUser }) => {
                     </Button>
                     <p>PUT /users/:userId</p>
                 </Col>
-                <Col xs='9'>
+                <Col md='8'>
                     {changePassword ? (
                         <ChangePasswordForm 
                             putUser={putUserPassword} 
@@ -116,7 +158,7 @@ const UserPanel = ({ currentUser }) => {
                 </Col>  
             </Row>
             <Row className='pt-3 border border-top-0'>
-                <Col xs='3'>
+                <Col md='4' className='border-end'>
                     <Button 
                         outline 
                         color='danger' 
@@ -127,7 +169,7 @@ const UserPanel = ({ currentUser }) => {
                     </Button>
                     <p>DEL /users/:userId</p>
                 </Col>
-                <Col xs='9'>
+                <Col md='8' className='pb-3'>
                     {deleteAccount ? (
                         <>
                             <div className='mb-2'>

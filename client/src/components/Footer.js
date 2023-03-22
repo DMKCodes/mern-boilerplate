@@ -5,10 +5,10 @@ const Footer = () => {
         <footer className='footer sticky-bottom border-top bg-success text-light'>
             <Container className='p-2'>
                 <Row>
-                    <Col>
+                    <Col md='4' xs='12'>
                         <p>Created by Douglas Kissack</p>
                     </Col>
-                    <Col>                     
+                    <Col md='4' xs='6'>                     
                         <a 
                             href='https://github.com/DMKCodes'
                             target='_blank'
@@ -18,7 +18,7 @@ const Footer = () => {
                             GitHub
                         </a>
                     </Col>
-                    <Col>                     
+                    <Col md='4' xs='6'>                     
                         <a 
                             href='https://dmk.codes/'
                             target='_blank'

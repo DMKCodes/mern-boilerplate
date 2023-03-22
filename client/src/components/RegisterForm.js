@@ -1,12 +1,14 @@
 import { useDispatch } from 'react-redux';
-import { setCurrentUser, setAdmin } from '../features/userSlice';
+import { setCurrentUser } from '../features/userSlice';
+import { useLoginMutation, useRegisterMutation } from '../features/authApiSlice';
 import { Col, Button, FormGroup, Label } from 'reactstrap';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
-import axios from 'axios';
 import * as yup from 'yup';
 
-const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
+const RegisterForm = ({ setModalOpen, setError, setErrorMsg, setActiveTab }) => {
     const dispatch = useDispatch();
+    const [register] = useRegisterMutation();
+    const [login] = useLoginMutation();
 
     const registerSchema = yup.object().shape({
         email: yup
@@ -33,59 +35,50 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
 
     const handleRegisterSubmit = async (values) => {
         try {
-            await axios.post('http://localhost:5000/users/register', values);
-
+            await register(values).unwrap();
             handleLoginSubmit(values);
         } catch (error) {
-            if (error.response && error.response.status === 409) {
-                setError(true);
-                setErrorMsg(error.response.data.error);
-                setTimeout(() => {
-                    setModalOpen(false);
-                    setError(false);
-                }, '3000');
+            setError(true);
+            if (!error?.data) {
+                setErrorMsg('No server response.');
+            } else if (error.data.status === 409) {
+                setErrorMsg(error.data.error);
             } else {
-                setError(true);
                 setErrorMsg('Internal error, please try again.  Redirecting...');
-                setTimeout(() => {
-                    setModalOpen(false);
-                    setError(false);
-                }, '3000');
             }
-        }
+            setTimeout(() => {
+                setModalOpen(false);
+                setError(false);
+            }, '3000');
+        };
     };
 
     const handleLoginSubmit = async (values) => {
         try {
-            const response = await axios.post('http://localhost:5000/users/login', values);
+            const response = await login(values).unwrap();
+            const user = response.user;
+            const token = response.token;
+            dispatch(setCurrentUser({ user, token }));
 
-            if (response.data.admin) {
-                dispatch(setAdmin(true));
-            }
-            const user = response.data.user;
-            user.token = response.data.token;
-            dispatch(setCurrentUser(user));
             setTimeout(() => {
                 setModalOpen(false);
+                setActiveTab('login');
                 setError(false);
             }, '2000');
         } catch (error) {
-            if (error.response && error.response.status === 401) {
-                setError(true);
-                setErrorMsg(`${error.response.data.error}, please try again.  Redirecting...`);
-                setTimeout(() => {
-                    setModalOpen(false);
-                    setError(false);
-                }, '3000');
+            setError(true);
+            if (!error?.data) {
+                setErrorMsg('No server response.');
+            } else if (error.data.status === 401) {
+                setErrorMsg(`${error.data.error}, please try again.  Redirecting...`);
             } else {
-                setError(true);
-                setErrorMsg('Internal error, please try again.  Redirecting...');
-                setTimeout(() => {
-                    setModalOpen(false);
-                    setError(false);
-                }, '3000');
+                setErrorMsg('Login failed, please try again. Redirecting...');
             }
-        }
+            setTimeout(() => {
+                setModalOpen(false);
+                setError(false);
+            }, '3000');
+        };
     };
 
     return (
@@ -105,10 +98,10 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
                     <Form className='p-3'>
                         <FormGroup row>
                             <Label htmlFor='username' md='3'>
-                                Username: 
+                                Username:
                             </Label>
                             <Col md='9'>
-                                <Field 
+                                <Field
                                     name='username'
                                     autoComplete='off'
                                     className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
@@ -124,10 +117,10 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
                         </FormGroup>
                         <FormGroup row>
                             <Label htmlFor='password' md='3'>
-                                Password: 
+                                Password:
                             </Label>
                             <Col md='9'>
-                                <Field 
+                                <Field
                                     name='password'
                                     autoComplete='off'
                                     className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
@@ -143,10 +136,10 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
                         </FormGroup>
                         <FormGroup row>
                             <Label htmlFor='confirmPassword' md='3'>
-                                Confirm Password: 
+                                Confirm Password:
                             </Label>
                             <Col md='9'>
-                                <Field 
+                                <Field
                                     name='confirmPassword'
                                     autoComplete='off'
                                     className={`form-control${errors.confirmPassword && touched.confirmPassword ? ' is-invalid' : ''}`}
@@ -162,10 +155,10 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg }) => {
                         </FormGroup>
                         <FormGroup row>
                             <Label htmlFor='email' md='3'>
-                                Email: 
+                                Email:
                             </Label>
                             <Col md='9'>
-                                <Field 
+                                <Field
                                     name='email'
                                     autoComplete='off'
                                     className={`form-control${errors.email && touched.email ? ' is-invalid' : ''}`}

@@ -9,9 +9,9 @@ const HomePage = () => {
             <p>Visit <a href='https://github.com/DMKCodes/node-express-mongo-boilerplate'>the back end repository</a> for more info about server and database setup.</p>
 
             <h3>Features</h3>
-            <p>Test all API endpoints via Axios, both with and without admin privileges.</p>
-            <p>Securely register, log in, log out, and authenticate users w/ JSON Web Tokens.</p>
-            <p>Formik forms w/ comprehensive Yup validation.</p>
+            <p>Comprehensive Redux RTK API to test all endpoints.</p>
+            <p>Securely register, log in, log out, and authenticate users w/ JWT access and refresh tokens.</p>
+            <p>Formik forms w/ Yup validation.</p>
             <p>Minimal styling with Reactstrap, easy to customize and make your own.</p>
 
             <h4>Notes</h4>

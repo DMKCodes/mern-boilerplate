@@ -1,12 +1,13 @@
 import { useDispatch } from 'react-redux';
-import { setCurrentUser, setAdmin } from '../features/userSlice';
+import { setCurrentUser } from '../features/userSlice';
+import { useLoginMutation } from '../features/authApiSlice';
 import { Col, Button, FormGroup, Label } from 'reactstrap';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
-import axios from 'axios';
 import * as yup from 'yup';
 
 const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
     const dispatch = useDispatch();
+    const [login] = useLoginMutation();
 
     const loginSchema = yup.object().shape({
         username: yup
@@ -25,35 +26,29 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
 
     const handleLoginSubmit = async (values) => {
         try {
-            const response = await axios.post('http://localhost:5000/users/login', values);
+            const response = await login(values).unwrap();
+            const user = response.user;
+            const token = response.token;
+            dispatch(setCurrentUser({ user, token }));
 
-            if (response.data.admin) {
-                dispatch(setAdmin(true));
-            }
-            const user = response.data.user;
-            user.token = response.data.token;
-            dispatch(setCurrentUser(user));
             setTimeout(() => {
                 setModalOpen(false);
                 setError(false);
             }, '2000');
         } catch (error) {
-            if (error.response && error.response.status === 401) {
-                setError(true);
-                setErrorMsg(`${error.response.data.error}, please try again.  Redirecting...`);
-                setTimeout(() => {
-                    setModalOpen(false);
-                    setError(false);
-                }, '3000');
+            setError(true);
+            if (!error?.data) {
+                setErrorMsg('No server response.');
+            } else if (error.data.status === 401) {
+                setErrorMsg(`${error.data.error}, please try again.  Redirecting...`);
             } else {
-                setError(true);
-                setErrorMsg('Internal error, please try again.  Redirecting...');
-                setTimeout(() => {
-                    setModalOpen(false);
-                    setError(false);
-                }, '3000');
+                setErrorMsg('Login failed, please try again. Redirecting...');
             }
-        }
+            setTimeout(() => {
+                setModalOpen(false);
+                setError(false);
+            }, '3000');
+        };
     };
 
     return (

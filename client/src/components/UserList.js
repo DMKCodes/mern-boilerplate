@@ -1,40 +1,52 @@
 import { useState } from 'react';
 import { Row, Col, Button } from 'reactstrap';
-import axios from 'axios';
+import { 
+    useGetAllUsersQuery, 
+    useDeleteAllUsersMutation 
+} from '../features/authApiSlice';
 import UserCard from './UserCard';
 
-const UserList = ({ token }) => {
+const UserList = () => {
     const [allUsers, setAllUsers] = useState('');
+    const [getAllUsersStarted, setGetAllUsersStarted] = useState(false);
     const [statusMsg, setStatusMsg] = useState('');
 
+    const getUsers = useGetAllUsersQuery(undefined, { skip: !getAllUsersStarted });
+    const [deleteUsers] = useDeleteAllUsersMutation();
+
     const getAllUsers = async () => {
+        setGetAllUsersStarted(true);
+
         try {
-            const response = await axios.get(
-                'http://localhost:5000/users/',
-                { headers: { 'Authorization': `Bearer ${token}` }}
-            );
+            const response = await getUsers.refetch();
 
             const users = response.data.allUsers;
             setAllUsers(users);
             setStatusMsg('All users successfully populated.');
         } catch (error) {
-            console.log(error);
-            setStatusMsg('Internal error.  Please try again later.');
+            if (!error?.data) {
+                setStatusMsg('No server response.');
+            } else if (error.data?.status === 403) {
+                setStatusMsg('Not authorized to perform this operation.');
+            } else {
+                setStatusMsg('Request failed.  Please try again later.');
+            }
         };
     };
 
     const delAllUsers = async () => {
         try {
-            await axios.delete(
-                'http://localhost:5000/users/',
-                { headers: { 'Authorization': `Bearer ${token}` }}
-            );
+            await deleteUsers().unwrap();
             
             setStatusMsg('All other users successfully deleted.');
             setAllUsers('');
         } catch (error) {
-            if (error.response?.status === 404) {
+            if (!error?.data) {
+                setStatusMsg('No server response.');
+            } else if (error.data.status === 404) {
                 setStatusMsg('No other users to delete.');
+            } else if (error.data.status === 403) {
+                setStatusMsg('Not authorized to perform this operation.');
             } else {
                 setStatusMsg('Internal error.  Please try again later.');
             }
@@ -68,7 +80,7 @@ const UserList = ({ token }) => {
                 </Col>
                 {statusMsg &&
                     <Col xs='12' className='mt-3'>
-                        <p className='text-success'><b>{statusMsg}</b></p>
+                        <p><b>{statusMsg}</b></p>
                     </Col>
                 }
                 </Row>
@@ -80,7 +92,6 @@ const UserList = ({ token }) => {
                                 <UserCard 
                                     key={user._id} 
                                     user={user} 
-                                    token={token} 
                                     setStatusMsg={setStatusMsg} 
                                 />
                             );

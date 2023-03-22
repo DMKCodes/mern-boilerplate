@@ -18,13 +18,13 @@ const DashboardPage = () => {
             </Row>
             <Row className='d-flex justify-content-center mb-5'>
                 <Col xs='10' md='8' className='pt-3'>
-                    <UserPanel currentUser={currentUser} />
+                    <UserPanel />
                 </Col>
             </Row>
             {isAdmin &&
                 <Row className='d-flex justify-content-center'>
                     <Col xs='10' md='8' className='pt-3'>
-                        <AdminPanel currentUser={currentUser} />
+                        <AdminPanel />
                     </Col>
                 </Row>
             }

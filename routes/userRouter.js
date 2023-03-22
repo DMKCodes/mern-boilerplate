@@ -3,6 +3,8 @@ const userRouter = express.Router();
 const User = require('../models/user');
 const passport = require('passport');
 const authenticate = require('../authenticate');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 userRouter.route('/')
 .get(authenticate.verifyUser, authenticate.verifyAdmin, async (req, res, next) => {
@@ -11,7 +13,8 @@ userRouter.route('/')
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json({ allUsers, status: 'All users successfully retrieved.' });
     } catch (err) {
-        return next(err);
+        console.error(err);
+        res.status(500).json({ error: err.message });
     }
 })
 .delete(authenticate.verifyUser, authenticate.verifyAdmin, async (req, res, next) => {
@@ -25,6 +28,7 @@ userRouter.route('/')
             res.status(200).json({ status: 'All users successfully deleted.'});
         }
     } catch (err) {
+        console.log(err);
         return next(err);
     }
 });
@@ -32,7 +36,7 @@ userRouter.route('/')
 userRouter.route('/:userId')
 .get(authenticate.verifyUser, async (req, res, next) => {
     try {
-        if (req.user._id.equals(req.params.userId) || req.user.admin) {
+        if (req.user._id.equals(req.params.userId) || req.body.admin) {
             const user = await User.findById(req.params.userId);
 
             res.setHeader('Content-Type', 'application/json');
@@ -46,14 +50,15 @@ userRouter.route('/:userId')
             res.status(403).json({ error: 'You are not authorized to view this user.' });
         }
     } catch (err) {
+        console.error(err);
         return next(err);
     }
 })
 .put(authenticate.verifyUser, async (req, res, next) => {
     try {
         if (req.user._id.equals(req.params.userId) || req.user.admin) {
-            if (req.body.password) {
-                const newPassword = req.body.password;
+            if (req.body.newVals?.password) {
+                const newPassword = req.body.newVals.password;
                 const user = await User.findById(req.params.userId);
                 if (user) {
                     await user.setPassword(newPassword);
@@ -66,9 +71,11 @@ userRouter.route('/:userId')
                     res.status(404).json({ error: 'This user does not exist.' });
                 }
             } else {
-                const updatedUser = await User.findByIdAndUpdate(req.params.userId, {
-                    $set: req.body
+                const user = await User.findByIdAndUpdate(req.params.userId, {
+                    $set: req.body.newVals
                 }, {new: true});
+
+                const updatedUser = await user.save();
 
                 res.setHeader('Content-Type', 'application/json');
                 if (updatedUser) {
@@ -82,6 +89,7 @@ userRouter.route('/:userId')
             res.status(403).json({ error: 'You are not authorized to modify this user.'})
         }
     } catch (err) {
+        console.log(err);
         return next(err);
     }
 })
@@ -107,10 +115,16 @@ userRouter.route('/:userId')
 
 userRouter.post('/register', async (req, res, next) => {
     try {
-        const userExists = await User.findOne({ $or: [{ username: req.body.username}, { email: req.body.email }] });
+        const userExists = await User.findOne({ 
+            $or: [{ username: req.body.username}, { email: req.body.email }] 
+        });
         if (!userExists) {
             User.register(new User(
-                { username: req.body.username, email: req.body.email, admin: req.body.admin }), 
+                { 
+                    username: req.body.username, 
+                    email: req.body.email, 
+                    admin: req.body.admin 
+                }), 
                 req.body.password,
                 () => {
                     passport.authenticate('local')(req, res, () => {
@@ -128,8 +142,8 @@ userRouter.post('/register', async (req, res, next) => {
     }
 });
 
-userRouter.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
+userRouter.post('/login', async (req, res, next) => {
+    passport.authenticate('local', async (err, user, info) => {
         if (err) {
             return next(err);
         }
@@ -138,26 +152,44 @@ userRouter.post('/login', (req, res, next) => {
             if (info.message === 'Password or username is incorrect') {
                 res.status(401).json({ error: 'Username or password is incorrect' });
             } else {
-                return next(err);
+                res.status(401).json({ error: 'Unknown error during authentication' });
             }
         } else {
             try {
-                const token = authenticate.getToken({ _id: user._id });
-                res.setHeader('Content-Type', 'application/json');
-                if (user.admin) {
-                    res.status(200).json({ 
-                        token,
-                        user,
-                        admin: true, 
-                        status: 'You have successfully logged in.'
-                    });
-                } else {
-                    res.status(200).json({ 
-                        token: token,
-                        user,
-                        status: 'You have successfully logged in.'
+                const cookies = req.cookies;
+                const newAccessToken = authenticate.getToken({ _id: user._id });
+                const newRefreshToken = authenticate.getRefreshToken({ _id: user._id });
+
+                if (cookies?.jwt) {
+                    res.clearCookie('jwt', { 
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'None', 
+                        maxAge: 24 * 60 * 60 * 1000
                     });
                 }
+
+                user.refreshToken = newRefreshToken;
+                await user.save();
+
+                res.cookie('jwt', newRefreshToken, { 
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'None',
+                    maxAge: 24 * 60 * 60 * 1000
+                });
+
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).json({ 
+                    user: {
+                        _id: user._id,
+                        username: user.username,
+                        admin: user.admin,
+                        email: user.email
+                    },
+                    token: newAccessToken,
+                    status: 'You have successfully logged in.'
+                });
             } catch (err) {
                 return next(err);
             }

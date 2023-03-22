@@ -1,8 +1,7 @@
 import { Container, Row, Col } from 'reactstrap';
 import UserList from './UserList';
 
-const AdminPanel = ({ currentUser }) => {
-    const { token } = currentUser;
+const AdminPanel = () => {
 
     return (
         <Container className='mb-5'>
@@ -15,7 +14,7 @@ const AdminPanel = ({ currentUser }) => {
                     <Row className='border border-top-0'>
                         <div><b>All Users</b></div>
                     </Row>
-                    <UserList token={token} />
+                    <UserList />
                 </Col>
             </Row>
         </Container>

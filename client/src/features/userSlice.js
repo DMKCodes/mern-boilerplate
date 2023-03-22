@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     currentUser: null,
-    isAdmin: false
+    token: null
 };
 
 const userSlice = createSlice({
@@ -12,20 +12,21 @@ const userSlice = createSlice({
         setCurrentUser: (state, action) => {
             return ({
                 ...state,
-                currentUser: action.payload
+                currentUser: action.payload.user,
+                token: action.payload.token
             });
         },
         clearCurrentUser: (state) => {
             return ({
                 ...state,
                 currentUser: null,
-                isAdmin: false
+                token: null
             });
         },
-        setAdmin: (state, action) => {
+        updateToken: (state, action) => {
             return ({
                 ...state,
-                isAdmin: action.payload
+                token: action.payload
             });
         }
     }
@@ -33,12 +34,16 @@ const userSlice = createSlice({
 
 export const userReducer = userSlice.reducer;
 
-export const { setCurrentUser, clearCurrentUser, setAdmin } = userSlice.actions;
+export const { setCurrentUser, clearCurrentUser, updateToken } = userSlice.actions;
 
 export const selectCurrentUser = (state) => {
     return state.user.currentUser;
 };
 
 export const checkAdmin = (state) => {
-    return state.user.isAdmin;
+    return state.user.currentUser.admin;
+};
+
+export const selectToken = (state) => {
+    return state.user.token;
 };

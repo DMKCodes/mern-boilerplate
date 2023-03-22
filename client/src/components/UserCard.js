@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { selectCurrentUser, clearCurrentUser } from '../features/userSlice';
+import { usePutUserByIdMutation, useDeleteUserByIdMutation } from '../features/authApiSlice';
 import { Row, Col, Button } from 'reactstrap';
 import ChangeUsernameForm from './ChangeUsernameForm';
-import axios from 'axios';
 
-const UserCard = ({ user, token, setStatusMsg }) => {
+const UserCard = ({ user, setStatusMsg }) => {
     const [changeUsername, setChangeUsername] = useState(false);
     const [usernameChanged, setUsernameChanged] = useState(false);
+    const [deleteUser, setDeleteUser] = useState(false);
     const [userDeleted, setUserDeleted] = useState(false);
 
     const { _id, username, email, admin } = user;
@@ -17,28 +18,34 @@ const UserCard = ({ user, token, setStatusMsg }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const [putUserById] = usePutUserByIdMutation();
+    const [deleteUserById] = useDeleteUserByIdMutation();
+
     const putUserUsername = async (values) => {
         try {
-            const response = await axios.put(
-                `http://localhost:5000/users/${_id}`,
-                { username: values.newUsername },
-                { headers: { 'Authorization': `Bearer ${token}` }}
-            );
-            console.log(response);
+            await putUserById({ 
+                _id,
+                newVals: { username: values.newUsername } 
+            }).unwrap();
 
             setChangeUsername(false);
             setUsernameChanged(true);
         } catch (error) {
-            setStatusMsg('Internal error.  Please try again later.');
+            if (!error?.data) {
+                setStatusMsg('No server response.');
+            } else if (error.data.status === 404) {
+                setStatusMsg('This user does not exist.');
+            } else if (error.data.status === 403) {
+                setStatusMsg('Not authorized to perform this operation.');
+            } else {
+                setStatusMsg('Operation failed. Please try again.');
+            }
         }
     };
 
     const delUser = async () => {
         try {
-            await axios.delete(
-                `http://localhost:5000/users/${_id}`,
-                { headers: { 'Authorization': `Bearer ${token}` }}
-            );
+            await deleteUserById({ _id }).unwrap();
             
             if (currentUser._id === _id) {
                 alert('Account successfully deleted.  Continue to homepage?');
@@ -50,7 +57,15 @@ const UserCard = ({ user, token, setStatusMsg }) => {
                 setUserDeleted(true);
             }
         } catch (error) {
-            console.log(error);
+            if (!error?.data) {
+                setStatusMsg('No server response.');
+            } else if (error.data.status === 404) {
+                setStatusMsg('This user does not exist.');
+            } else if (error.data.status === 403) {
+                setStatusMsg('Not authorized to perform this operation.');
+            } else {
+                setStatusMsg('Operation failed. Please try again.');
+            }
         }
     };
 
@@ -84,12 +99,31 @@ const UserCard = ({ user, token, setStatusMsg }) => {
                 <Col md='6'>
                     {userDeleted ? (
                         <p className='text-success'><b>User successfully deleted.</b></p>
+                    ) : deleteUser ? (
+                        <>
+                            <p>Are you sure?</p>
+                            <Button 
+                                type='submit' 
+                                color='danger'
+                                className='me-2'
+                                onClick={() => delUser()}
+                            >
+                                Confirm
+                            </Button>
+                            <Button 
+                                type='button' 
+                                color='secondary' 
+                                onClick={() => setDeleteUser(false)}
+                            >
+                                Cancel
+                            </Button>
+                        </>
                     ) : (
                         <Button
                             outline
                             type='submit'
                             color='danger'
-                            onClick={() => delUser()}
+                            onClick={() => setDeleteUser(true)}
                         >
                             Delete User
                         </Button>

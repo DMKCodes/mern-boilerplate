@@ -3,17 +3,16 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const passport = require('passport');
-const config = require('./config');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const indexRouter = require('./routes/indexRouter');
+const refreshTokenRouter = require('./routes/refreshTokenRouter');
 const userRouter = require('./routes/userRouter');
-const uploadRouter = require('./routes/uploadRouter');
 
 // configure mongodb w/ mongoose
 const mongoose = require('mongoose');
-const url = config.mongoUrl;
-const connect = mongoose.connect(url, {
+const connect = mongoose.connect('mongodb://127.0.0.1:27017/mern-boiler', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
@@ -31,11 +30,13 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 const corsOptions = {
     origin: 'http://localhost:3000',
     methods: 'GET,PUT,POST,DELETE',
-    allowedHeaders: 'Content-Type, Authorization',
+    allowedHeaders: 'Content-Type, Authorization, Access-Control-Allow-Credentials',
+    credentials: true,
     optionsSuccessStatus: 200
 };
 
@@ -44,8 +45,8 @@ app.use(cors(corsOptions));
 app.use(passport.initialize());
 
 app.use('/', indexRouter);
+app.use('/refresh', refreshTokenRouter);
 app.use('/users', userRouter);
-app.use('/imageUpload', uploadRouter);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
