@@ -22,7 +22,7 @@ exports.getRefreshToken = (user) => {
     return jwt.sign(
         user, 
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: '1d' }
+        { expiresIn: '7d' }
     );
 };
 

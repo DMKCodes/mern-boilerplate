@@ -5,7 +5,6 @@ const authenticate = require('../authenticate');
 const jwt = require('jsonwebtoken');
 
 router.get('/', async (req, res, next) => {
-    console.trace('Refresh route handler called');
     try {
         const cookies = req.cookies;
         if (!cookies?.jwt) {
@@ -48,6 +47,12 @@ router.get('/', async (req, res, next) => {
                 res.setHeader('Content-Type', 'application/json');
                 return res.status(200).json({ 
                     token: accessToken,
+                    user: {
+                        _id: foundUser._id,
+                        username: foundUser.username,
+                        admin: foundUser.admin,
+                        email: foundUser.email
+                    },
                     status: 'You have successfully logged in.'
                 });
             }

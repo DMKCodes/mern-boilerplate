@@ -1,12 +1,16 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentUser } from '../features/userSlice';
 import { useLoginMutation } from '../features/authApiSlice';
+import usePersist from '../hooks/usePersist';
 import { Col, Button, FormGroup, Label } from 'reactstrap';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 
 const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
     const dispatch = useDispatch();
+
+    const [persist, setPersist] = usePersist();
+
     const [login] = useLoginMutation();
 
     const loginSchema = yup.object().shape({
@@ -26,7 +30,14 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
 
     const handleLoginSubmit = async (values) => {
         try {
-            const response = await login(values).unwrap();
+            if (values.remember) {
+                setPersist(true);
+            }
+
+            const response = await login({ 
+                username: values.username, 
+                password: values.password 
+            }).unwrap();
             const user = response.user;
             const token = response.token;
             dispatch(setCurrentUser({ user, token }));
@@ -55,7 +66,8 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
         <Formik
             initialValues={{
                 username: '',
-                password: ''
+                password: '',
+                remember: false
             }}
             validationSchema={loginSchema}
             onSubmit={handleLoginSubmit}
@@ -100,6 +112,19 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
                                         className='invalid-feedback'
                                     />
                                 ) : null}
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Label check htmlFor='remember' md='3'>
+                                Remember me?
+                            </Label>
+                            <Col md='9'>
+                                <Field
+                                    name='remember'
+                                    type='checkbox'
+                                    className='form-check-input mt-2'
+                                    checked={persist}
+                                />
                             </Col>
                         </FormGroup>
                         <FormGroup row>

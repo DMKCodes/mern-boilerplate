@@ -1,4 +1,5 @@
 import { apiSlice } from '../app/api/apiSlice';
+import { setCurrentUser, updateToken } from './userSlice';
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -42,6 +43,24 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
                 body: { ...credentials }
             })
+        }),
+        refresh: builder.mutation({
+            query: () => ({
+                url: '/refresh',
+                method: 'GET'
+            }),
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    console.log(data);
+                    const { token, user } = data;
+                    dispatch(updateToken({ token }));
+                    dispatch(setCurrentUser({ user }));
+                    console.log('success');
+                } catch (error) {
+                    console.log(error);
+                }
+            }
         })
     })
 });
@@ -53,5 +72,6 @@ export const {
     useDeleteAllUsersMutation,
     useGetUserByIdQuery,
     usePutUserByIdMutation,
-    useDeleteUserByIdMutation
+    useDeleteUserByIdMutation,
+    useRefreshMutation
 } = authApiSlice;
