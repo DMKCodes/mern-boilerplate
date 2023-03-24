@@ -41,7 +41,7 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg, setActiveTab }) => 
             setError(true);
             if (!error?.data) {
                 setErrorMsg('No server response.');
-            } else if (error.data.status === 409) {
+            } else if (error.status === 409) {
                 setErrorMsg(error.data.error);
             } else {
                 setErrorMsg('Internal error, please try again.  Redirecting...');
@@ -69,7 +69,7 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg, setActiveTab }) => 
             setError(true);
             if (!error?.data) {
                 setErrorMsg('No server response.');
-            } else if (error.data.status === 401) {
+            } else if (error.status === 401) {
                 setErrorMsg(`${error.data.error}, please try again.  Redirecting...`);
             } else {
                 setErrorMsg('Login failed, please try again. Redirecting...');
@@ -122,6 +122,7 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg, setActiveTab }) => 
                             <Col md='9'>
                                 <Field
                                     name='password'
+                                    type='password'
                                     autoComplete='off'
                                     className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
                                 />
@@ -141,6 +142,7 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg, setActiveTab }) => 
                             <Col md='9'>
                                 <Field
                                     name='confirmPassword'
+                                    type='password'
                                     autoComplete='off'
                                     className={`form-control${errors.confirmPassword && touched.confirmPassword ? ' is-invalid' : ''}`}
                                 />
@@ -186,7 +188,7 @@ const RegisterForm = ({ setModalOpen, setError, setErrorMsg, setActiveTab }) => 
                         </FormGroup>
                         <FormGroup row>
                             <Col className='d-flex justify-content-center'>
-                                <Button type='submit' color='primary' className='me-3'>
+                                <Button type='submit' color='success' className='me-3'>
                                     Register
                                 </Button>
                                 <Button type='button' color='secondary' onClick={() => setModalOpen(false)}>

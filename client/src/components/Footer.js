@@ -2,7 +2,7 @@ import { Container, Row, Col} from 'reactstrap';
 
 const Footer = () => {
     return (
-        <footer className='footer sticky-bottom border-top bg-success text-light'>
+        <footer className='footer sticky-bottom bg-success text-light'>
             <Container className='p-2'>
                 <Row>
                     <Col md='4' xs='12'>

@@ -47,10 +47,11 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
                 setError(false);
             }, '2000');
         } catch (error) {
+            console.log(error);
             setError(true);
             if (!error?.data) {
                 setErrorMsg('No server response.');
-            } else if (error.data.status === 401) {
+            } else if (error.status === 401) {
                 setErrorMsg(`${error.data.error}, please try again.  Redirecting...`);
             } else {
                 setErrorMsg('Login failed, please try again. Redirecting...');
@@ -102,6 +103,7 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
                             <Col md='9'>
                                 <Field 
                                     name='password'
+                                    type='password'
                                     autoComplete='off'
                                     className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
                                 />
@@ -129,7 +131,7 @@ const LoginForm = ({ setModalOpen, setError, setErrorMsg }) => {
                         </FormGroup>
                         <FormGroup row>
                             <Col className='d-flex justify-content-center'>
-                                <Button type='submit' color='primary' className='me-3'>
+                                <Button type='submit' color='success' className='me-3'>
                                     Login
                                 </Button>
                                 <Button type='button' color='secondary' onClick={() => setModalOpen(false)}>

@@ -1,4 +1,4 @@
-import { Col, FormGroup, Button } from 'reactstrap';
+import { Col, FormGroup, Button, Label } from 'reactstrap';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 
@@ -24,7 +24,10 @@ const ChangeUsernameForm = ({ setChangeUsername, putUserUsername }) => {
                 return (
                     <Form className='p-2'>
                         <FormGroup row className='justify-content-center'>
-                            <Col md='8'>
+                            <Label htmlFor='newUsername'>
+                                New Username:
+                            </Label>
+                            <Col xs='8'>
                                 <Field 
                                     name='newUsername'
                                     autoComplete='off'

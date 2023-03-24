@@ -37,6 +37,7 @@ const ChangePasswordForm = ({ putUser, setChangePassword }) => {
                             <Col md='9'>
                                 <Field 
                                     name='currentPassword'
+                                    type='password'
                                     autoComplete='off'
                                     className={`form-control${errors.currentPassword && touched.currentPassword ? ' is-invalid' : ''}`}
                                 />
@@ -56,6 +57,7 @@ const ChangePasswordForm = ({ putUser, setChangePassword }) => {
                             <Col md='9'>
                                 <Field 
                                     name='newPassword'
+                                    type='password'
                                     autoComplete='off'
                                     className={`form-control${errors.newPassword && touched.newPassword ? ' is-invalid' : ''}`}
                                 />
@@ -75,6 +77,7 @@ const ChangePasswordForm = ({ putUser, setChangePassword }) => {
                             <Col md='9'>
                                 <Field 
                                     name='confirmNewPassword'
+                                    type='password'
                                     autoComplete='off'
                                     className={`form-control${errors.confirmNewPassword && touched.confirmNewPassword ? ' is-invalid' : ''}`}
                                 />

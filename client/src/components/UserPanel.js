@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectCurrentUser, clearCurrentUser } from '../features/userSlice';
 import { useNavigate } from 'react-router-dom';
@@ -12,9 +12,9 @@ import ChangePasswordForm from './ChangePasswordForm';
 
 const UserPanel = () => {
     const [fetchedUser, setFetchedUser] = useState({
-        _id: '',
-        username: '',
-        email: ''
+        _id: false,
+        username: false,
+        email: false
     });
 
     const [getUserStarted, setGetUserStarted] = useState(false);
@@ -25,8 +25,7 @@ const UserPanel = () => {
     const [deleteAccount, setDeleteAccount] = useState(false);
     const [accountDeleted, setAccountDeleted] = useState(false);
 
-    const [error, setError] = useState(false);
-    const [errorMsg, setErrorMsg] = useState('');
+    const [statusMsg, setStatusMsg] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -38,45 +37,40 @@ const UserPanel = () => {
     const [putUserById] = usePutUserByIdMutation();
     const [deleteUserById] = useDeleteUserByIdMutation();
 
-    const getUser = async () => {
-        setGetUserStarted(true);
-
-        try {
-            const response = await getUserById.refetch();
-
-            const user = response.data.user;
-            setFetchedUser(user);
-            setError(false);
-        } catch (error) {
-            setError(true);
-            if (!error?.data) {
-                setErrorMsg('No server response.');
-            } else if (error.data.status === 404) {
-                setErrorMsg('This user does not exist.');
-            } else if (error.data.status === 403) {
-                setErrorMsg('Not authorized to perform this operation.');
-            } else {
-                setErrorMsg('Operation failed. Please try again.');
+    useEffect(() => {
+        if (getUserStarted) {
+            if (fetchedUser._id) {
+                getUserById.refetch();
             }
-        };
-    };
+            const { data, error } = getUserById;
+
+            if (error) {
+                setStatusMsg('Error retrieving user details.');
+            } else if (data) {
+                const { _id, username, email } = data.user;
+                setStatusMsg('Successfully retrieved user details.');
+                setFetchedUser({ _id, username, email });
+                setGetUserStarted(false);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [getUserStarted, getUserById]);
 
     const putUserPassword = async (values) => {
         try {
             await putUserById({ _id, newVals: { password: values.newPassword } }).unwrap();
             setChangePassword(false);
             setPasswordChanged(true);
-            setError(false);
+            setStatusMsg(false);
         } catch (error) {
-            setError(true);
             if (!error?.data) {
-                setErrorMsg('No server response.');
-            } else if (error.data.status === 404) {
-                setErrorMsg('This user does not exist.');
-            } else if (error.data.status === 403) {
-                setErrorMsg('Not authorized to perform this operation.');
+                setStatusMsg('No server response.');
+            } else if (error.status === 404) {
+                setStatusMsg('This user does not exist.');
+            } else if (error.status === 403) {
+                setStatusMsg('Not authorized to perform this operation.');
             } else {
-                setErrorMsg('Operation failed. Please try again.');
+                setStatusMsg('Operation failed. Please try again.');
             }
         }
     };
@@ -87,22 +81,21 @@ const UserPanel = () => {
 
             setDeleteAccount(false);
             setAccountDeleted(true);
-            setError(false);
+            setStatusMsg(false);
             
             setTimeout(() => {
                 navigate('/');
                 dispatch(clearCurrentUser());
             }, '2000');
         } catch (error) {
-            setError(true);
             if (!error?.data) {
-                setErrorMsg('No server response.');
-            } else if (error.data.status === 404) {
-                setErrorMsg('This user does not exist.');
-            } else if (error.data.status === 403) {
-                setErrorMsg('Not authorized to perform this operation.');
+                setStatusMsg('No server response.');
+            } else if (error.status === 404) {
+                setStatusMsg('This user does not exist.');
+            } else if (error.status === 403) {
+                setStatusMsg('Not authorized to perform this operation.');
             } else {
-                setErrorMsg('Operation failed. Please try again.');
+                setStatusMsg('Operation failed. Please try again.');
             }
         }
     };
@@ -112,8 +105,8 @@ const UserPanel = () => {
             <Row className='border'>
                 <h4 className='pt-2'>User Panel</h4>
                 <p>Use this panel to view and modify your own account.</p>
-                {error &&
-                    <p><b>{errorMsg}</b></p>
+                {statusMsg &&
+                    <p><b>{statusMsg}</b></p>
                 }
             </Row>
             <Row className='pt-3 border border-top-0'>
@@ -122,7 +115,7 @@ const UserPanel = () => {
                         outline 
                         color='primary' 
                         type='submit' 
-                        onClick={() => getUser()}
+                        onClick={() => setGetUserStarted(true)}
                     >
                         Populate Details
                     </Button>

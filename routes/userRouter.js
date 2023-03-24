@@ -3,7 +3,6 @@ const userRouter = express.Router();
 const User = require('../models/user');
 const passport = require('passport');
 const authenticate = require('../authenticate');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 userRouter.route('/')
@@ -13,7 +12,6 @@ userRouter.route('/')
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json({ allUsers, status: 'All users successfully retrieved.' });
     } catch (err) {
-        console.error(err);
         res.status(500).json({ error: err.message });
     }
 })
@@ -28,7 +26,6 @@ userRouter.route('/')
             res.status(200).json({ status: 'All users successfully deleted.'});
         }
     } catch (err) {
-        console.log(err);
         return next(err);
     }
 });
@@ -89,7 +86,6 @@ userRouter.route('/:userId')
             res.status(403).json({ error: 'You are not authorized to modify this user.'})
         }
     } catch (err) {
-        console.log(err);
         return next(err);
     }
 })
@@ -149,6 +145,7 @@ userRouter.post('/login', async (req, res, next) => {
         }
         if (!user) {
             res.setHeader('Content-Type', 'application/json');
+            console.log(info.message);
             if (info.message === 'Password or username is incorrect') {
                 res.status(401).json({ error: 'Username or password is incorrect' });
             } else {

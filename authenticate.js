@@ -34,7 +34,6 @@ exports.jwtPassport = passport.use(
     new JwtStrategy(
         opts,
         async (jwt_payload, done) => {
-            console.log('JWT payload:', jwt_payload);
             try {
                 const user = await User.findOne({ _id: jwt_payload._id }).exec();
                 if (!user) {
@@ -50,13 +49,11 @@ exports.jwtPassport = passport.use(
 );
 
 exports.verifyUser = (req, res, next) => {
-    console.log('verify user reached');
     passport.authenticate('jwt', { session: false }, (err, user) => {
         if (err) {
-            return next(err);
-        } else if (!user) {
-            res.setHeader('Content-Type', 'application/json');
             return res.status(401).json({ error: 'Unauthorized' });
+        } else if (!user) {
+            return res.status(401).json({ error: 'Unauthorized, no user matching this token' });
         } else {
             req.user = user;
             return next();
@@ -65,7 +62,6 @@ exports.verifyUser = (req, res, next) => {
 };
 
 exports.verifyAdmin = (req, res, next) => {
-    console.log(req.user);
     if (req.user?.admin) {
         return next();
     } else {

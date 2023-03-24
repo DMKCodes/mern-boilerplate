@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Row, Col, Button } from 'reactstrap';
 import { 
     useGetAllUsersQuery, 
@@ -11,41 +11,40 @@ const UserList = () => {
     const [getAllUsersStarted, setGetAllUsersStarted] = useState(false);
     const [statusMsg, setStatusMsg] = useState('');
 
-    const getUsers = useGetAllUsersQuery(undefined, { skip: !getAllUsersStarted });
-    const [deleteUsers] = useDeleteAllUsersMutation();
+    const getAllUsers = useGetAllUsersQuery(undefined, { skip: !getAllUsersStarted });
+    const [deleteAllUsers] = useDeleteAllUsersMutation();
 
-    const getAllUsers = async () => {
-        setGetAllUsersStarted(true);
-
-        try {
-            const response = await getUsers.refetch();
-
-            const users = response.data.allUsers;
-            setAllUsers(users);
-            setStatusMsg('All users successfully populated.');
-        } catch (error) {
-            if (!error?.data) {
-                setStatusMsg('No server response.');
-            } else if (error.data?.status === 403) {
-                setStatusMsg('Not authorized to perform this operation.');
-            } else {
-                setStatusMsg('Request failed.  Please try again later.');
+    useEffect(() => {
+        if (getAllUsersStarted) {
+            if (allUsers) {
+                getAllUsers.refetch();
             }
-        };
-    };
+            const { data, error } = getAllUsers;
+
+            if (error) {
+                setStatusMsg('Error retrieving users.');
+                setGetAllUsersStarted(false);
+            } else if (data) {
+                setStatusMsg('Successfully retrieved all users.');
+                setAllUsers(data.allUsers);
+                setGetAllUsersStarted(false);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [getAllUsersStarted, getAllUsers]);
 
     const delAllUsers = async () => {
         try {
-            await deleteUsers().unwrap();
+            await deleteAllUsers().unwrap();
             
             setStatusMsg('All other users successfully deleted.');
             setAllUsers('');
         } catch (error) {
             if (!error?.data) {
                 setStatusMsg('No server response.');
-            } else if (error.data.status === 404) {
+            } else if (error.status === 404) {
                 setStatusMsg('No other users to delete.');
-            } else if (error.data.status === 403) {
+            } else if (error.status === 403) {
                 setStatusMsg('Not authorized to perform this operation.');
             } else {
                 setStatusMsg('Internal error.  Please try again later.');
@@ -55,13 +54,13 @@ const UserList = () => {
 
     return (
         <>
-            <Row className='border border-top-0 justify-content-center p-2'>
+            <Row className='border border-top-0 justify-content-center p-3'>
                 <Col md='4'>
                     <Button 
                         outline 
                         type='submit' 
                         color='primary' 
-                        onClick={() => getAllUsers()}
+                        onClick={() => setGetAllUsersStarted(true)}
                     >
                         Populate Users
                     </Button>
@@ -83,7 +82,7 @@ const UserList = () => {
                         <p><b>{statusMsg}</b></p>
                     </Col>
                 }
-                </Row>
+            </Row>
             <Row className='border border-top-0 justify-content-center p-2'>
                 {allUsers ? (
                     <>

@@ -22,6 +22,10 @@ const UserCard = ({ user, setStatusMsg }) => {
     const [deleteUserById] = useDeleteUserByIdMutation();
 
     const putUserUsername = async (values) => {
+        if (values.newUsername === username) {
+            setStatusMsg('New username cannot be the same as current username.');
+            return;
+        }
         try {
             await putUserById({ 
                 _id,
@@ -33,9 +37,9 @@ const UserCard = ({ user, setStatusMsg }) => {
         } catch (error) {
             if (!error?.data) {
                 setStatusMsg('No server response.');
-            } else if (error.data.status === 404) {
+            } else if (error.status === 404) {
                 setStatusMsg('This user does not exist.');
-            } else if (error.data.status === 403) {
+            } else if (error.status === 403) {
                 setStatusMsg('Not authorized to perform this operation.');
             } else {
                 setStatusMsg('Operation failed. Please try again.');
@@ -48,20 +52,20 @@ const UserCard = ({ user, setStatusMsg }) => {
             await deleteUserById({ _id }).unwrap();
             
             if (currentUser._id === _id) {
-                alert('Account successfully deleted.  Continue to homepage?');
+                setStatusMsg('Account successfully deleted.  Redirecting...');
                 setTimeout(() => {
                     navigate('/');
                     dispatch(clearCurrentUser());
-                }, '2000');
+                }, '3000');
             } else {
                 setUserDeleted(true);
             }
         } catch (error) {
             if (!error?.data) {
                 setStatusMsg('No server response.');
-            } else if (error.data.status === 404) {
+            } else if (error.status === 404) {
                 setStatusMsg('This user does not exist.');
-            } else if (error.data.status === 403) {
+            } else if (error.status === 403) {
                 setStatusMsg('Not authorized to perform this operation.');
             } else {
                 setStatusMsg('Operation failed. Please try again.');
@@ -101,7 +105,7 @@ const UserCard = ({ user, setStatusMsg }) => {
                         <p className='text-success'><b>User successfully deleted.</b></p>
                     ) : deleteUser ? (
                         <>
-                            <p>Are you sure?</p>
+                            <p>Are you sure you want to delete your account?  This operation is <b style={{ color: 'red' }}>permanent</b>.</p>
                             <Button 
                                 type='submit' 
                                 color='danger'

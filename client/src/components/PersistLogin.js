@@ -49,7 +49,7 @@ const PersistLogin = () => {
     } else if (isError) {
         console.log(error);
         content = (
-            <p>Error refreshing your details.  Please login again.</p>
+            <p>Error refreshing your details.  Please refresh or try logging in again.</p>
         );
     } else if (isSuccess && trueSuccess) {
         console.log('persist success');
