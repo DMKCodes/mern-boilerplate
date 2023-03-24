@@ -11,8 +11,9 @@ const HomePage = () => {
             <h3>Features</h3>
             <p>Comprehensive Redux RTK API to test all endpoints.</p>
             <p>Securely register, log in, log out, and authenticate users w/ JWT access and refresh tokens.</p>
+            <p>Persistent refresh token authentication remembers users on app refresh.</p>
             <p>Formik forms w/ Yup validation.</p>
-            <p>Minimal styling with Reactstrap, easy to customize and make your own.</p>
+            <p>Minimal styling with Reactstrap, responsive and easy to customize.</p>
 
             <h4>Notes</h4>
             <p>This boilerplate is not production ready until certain features have been removed - e.g., enabling admin privileges from the register form.</p>
