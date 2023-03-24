@@ -2,7 +2,7 @@
 
 mern-boilerplate is a boilerplate MERN project for rapid development of full stack web applications.
 
-This project is in a finished state, but see notes below for planned future updates.
+This project is in a finished state, but see below for planned future updates.
 
 ##Initial Setup: 
 
@@ -48,7 +48,7 @@ Front End (React, Redux)
 - At a minimum, adding https on the server side is necessary.
 - As a relatively new programmer, I have done my best to implement security features in accordance with best practice, but I still have much to learn! PLEASE feel free to reach out with any comments or criticisms of my approaches.
 
-Planned Updates
+##Planned Updates:
 - Improve accessibility and screen reader compatibility.
 - Add show/hide password icon on password fields in Formik forms. 
 
