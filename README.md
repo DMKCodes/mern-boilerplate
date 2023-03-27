@@ -20,7 +20,7 @@ This project is in a finished state, but see below for planned future updates.
 - In a bash terminal in the mongodb directory, use command 'mongod --dbpath=data' to start the MongoDB server.
 - In a bash terminal, use command 'mongo' to start the Mongo REPL (Read Evaluate Print Loop) shell.
 - Use command 'db' then command 'use mern-boiler' or a name of your choice, updating the mongoUrl in the root directory's app.js file (line 15) accordingly.
-- Use command 'db.createCollection(users);' to initialize the users collection.
+- Use command 'db.createCollection('users');' to initialize the users collection.
 
 ##Testing: 
 
