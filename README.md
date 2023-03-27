@@ -11,7 +11,7 @@ This project is in a finished state, but see below for planned future updates.
 - In the www file in the bin directory, ensure this line specifies port 5000: 
       var port = normalizePort(process.env.PORT || '5000');
 - Install dependencies for the root directory and client directory with 'npm i'.
-- Create a .env file in the root directory, and in this file add ACCESS_TOKEN_SECRET=<your access key> and REFRESH_TOKEN_SECRET=<your refresh key>.
+- Create a .env file in the root directory, and in this file add ACCESS_TOKEN_SECRET='your access key' and REFRESH_TOKEN_SECRET='your refresh key'.
 
 ##MongoDB Server Initial Config for Testing:
 
